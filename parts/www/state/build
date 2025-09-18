@@ -1,0 +1,30 @@
+!BuildState
+assets:
+  installed-packages: []
+  installed-snaps:
+  - core20=2599
+  - core22=2111
+  - lxd=31333
+  - snapcraft=7201
+  - snapd=25202
+  uname: 'Linux 5.15.0-151-generic #161-Ubuntu SMP Tue Jul 22 14:25:40 UTC 2025 x86_64
+    x86_64 x86_64 GNU/Linux'
+extracted_metadata:
+  files: []
+  metadata: !ExtractedMetadata
+    _data: {}
+    common_id_list: []
+project_options:
+  deb_arch: amd64
+properties:
+  after: []
+  build-attributes: []
+  build-packages: []
+  disable-parallel: false
+  organize:
+    '*': www/
+  override-build: snapcraftctl build
+schema_properties: {}
+scriptlet_metadata: !ExtractedMetadata
+  _data: {}
+  common_id_list: []

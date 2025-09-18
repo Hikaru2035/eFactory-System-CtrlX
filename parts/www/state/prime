@@ -1,0 +1,24 @@
+!PrimeState
+dependency_paths: !!set {}
+directories: !!set
+  www: null
+files: !!set
+  www/background001.png: null
+  www/cloud.html: null
+  www/favicon.png: null
+  www/index.html: null
+  www/invalid-token.html: null
+  www/logo.png: null
+  www/mes.html: null
+  www/scada.html: null
+  www/script.js: null
+  www/stylesheet.css: null
+primed_stage_packages: !!set {}
+project_options: {}
+properties:
+  override-prime: snapcraftctl prime
+  prime:
+  - '*'
+scriptlet_metadata: !ExtractedMetadata
+  _data: {}
+  common_id_list: []

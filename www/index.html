@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <title>eFactory System</title>
+    <link rel="icon" type="image/jpg" sizes="16x16" href="/python-webserver/favicon.png">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/python-webserver/stylesheet.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+</head>
+
+<body>
+    <!-- Header -->
+    <div class="topbar">
+        <div class="topbar-left">
+            <img class="logo" src="/python-webserver/logo.png" alt="Logo">
+            <h2>eFactory System</h2>
+        </div>
+        <div class="nav">
+            <a href="/python-webserver?token=$(token)" class="chip">Home</a>
+            <a href="/python-webserver/scada.html?token=$(token)" class="chip">SCADA</a>
+            <a href="/python-webserver/mes.html?token=$(token)" class="chip">MES</a>
+            <a href="/python-webserver/cloud.html?token=$(token)" class="chip">Cloud</a>
+            <a href="/python-webserver/admin.html?token=$(token)" class="chip">Admin</a>
+        </div>
+    </div>
+
+    <div class="stage">
+        <!-- Left Top Cards (OEE + OBJ Moni) -->
+        <div class="left-top">
+            <div class="blank"></div>
+
+            <div class="card dark">
+                <h3>MACHINE OEE</h3>
+                <div class="oee-column">
+                    <div class="oee-content">
+                        <div class="oee-value" id="oee">--</div>
+                        <ul class="oee-list">
+                        <li><span class="label">Availability</span><span class="value" id="availability">--</span></li>
+                        <li><span class="label">Performance</span><span class="value" id="performance">--</span></li>
+                        <li><span class="label">Quality</span><span class="value" id="quality">--</span></li>
+                        </ul>
+                    </div>
+                    <ul class="oee-nav">
+                        <li>Previous</li>
+                        <li>Factory A</li>
+                        <li>Next</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>OBJECT PLACEMENT MONITORING</h3>
+                <div class="object-grid">
+                <div class="obj-item">
+                    35<br />Object1<br /><span class="badge ok">✓</span>
+                </div>
+                <div class="obj-item">
+                    35<br />Object2<br /><span class="badge ok">✓</span>
+                </div>
+                <div class="obj-item">
+                    35<br />Object3<br /><span class="badge warn">!</span>
+                </div>
+                <div class="obj-item">
+                    35<br />Object4<br /><span class="badge ok">✓</span>
+                </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Left Bottom Card (Environment Moni) -->
+        <div class="left-bottom">
+            <div class="card">
+                <h3>ENVIRONMENTAL MONITORING</h3>
+                <div class="env-charts">
+                <div class="gauge-container">
+                    <canvas id="tempGauge"></canvas>
+                    <div class="gauge-label">AVG. Temperature</div>
+                </div>
+                <div class="gauge-container">
+                    <canvas id="humidityGauge"></canvas>
+                    <div class="gauge-label">AVG. Humidity</div>
+                </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Bottom Card (Running + Error Logs) -->
+        <div class="right-bottom">
+            <div class="card">
+                <h3>RUNNING SCHEDULE</h3>
+                <canvas id="scheduleChart"></canvas>
+            </div>
+
+            <div class="card">
+                <h3>ERRORS LOG</h3>
+                <section class="table_body">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Location</th>
+                                <th>Order Date</th>
+                                <th>Status</th>
+                                <th>Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            $(error_rows)
+                        </tbody>
+                    </table>
+                </section> 
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Running Schedule
+        new Chart(document.getElementById('scheduleChart'), {
+            type: 'bar',
+            data: {
+                labels: ['01/01','02/01','03/01','04/01','05/01','06/01','07/01'],
+                datasets: [{
+                data: [20,12,22,21,19,10,23],
+                backgroundColor: '#001B48'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                legend: { display: false },
+                datalabels: {
+                    anchor: 'end',
+                    align: 'end',
+                    color: '#001B48',
+                    font: { weight: 'bold' }
+                }
+                },
+                scales: {
+                x: {
+                    ticks: {
+                    color: '#001B48',
+                    font: { size: 12 }
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                    color: '#001B48'
+                    }
+                }
+                }
+            },
+            plugins: [ChartDataLabels]
+        });
+
+        // Gauge chart
+        const gaugeText = {
+            id: 'gaugeText',
+            afterDraw(chart, args, options) {
+            const {ctx, chartArea: {width, height}} = chart;
+            ctx.save();
+            ctx.font = 'bold 24px Arial';
+            ctx.fillStyle = '#001B48';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            const value = chart.config.data.datasets[0].data[0];
+            const unit = chart.config.options.plugins.gaugeUnit || ''; // lấy unit
+            ctx.fillText(value + unit, width / 2, height / 2);
+            }
+        };
+        function createGauge(ctx, value, color, unit) {
+            return new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                data: [value, 100 - value],
+                backgroundColor: [color, '#001B48'],
+                borderWidth: 0
+                }]
+            },
+            options: {
+                cutout: '65%',
+                plugins: {
+                legend: { display: false },
+                tooltip: { enabled: false },
+                gaugeUnit: unit
+                }
+            },
+            plugins: [gaugeText]
+            });
+        }
+        
+        const token = "$(token)"; // server đã render token
+
+        const tempGauge = createGauge(document.getElementById('tempGauge'), 0, '#018ABE', '℃');
+        const humidityGauge = createGauge(document.getElementById('humidityGauge'), 0, '#018ABE', '%');
+
+        function updateData() {
+            fetch(`/python-webserver/api/data?token=${token}`)
+                .then(res => res.json())
+                .then(data => {
+                    // Update OEE text
+                    document.getElementById("availability").textContent = data.availability;
+                    document.getElementById("performance").textContent = data.performance;
+                    document.getElementById("quality").textContent = data.quality;
+                    document.getElementById("oee").textContent = data.oee;
+
+                    // Update Gauges
+                    tempGauge.data.datasets[0].data = [data.temperature, 100 - data.temperature];
+                    tempGauge.update();
+
+                    humidityGauge.data.datasets[0].data = [data.humidity, 100 - data.humidity];
+                    humidityGauge.update();
+                })
+                .catch(err => console.error("Polling error:", err));
+        }
+
+        updateData();
+        setInterval(updateData, 1000);
+
+    </script>
+</body>
+</html>

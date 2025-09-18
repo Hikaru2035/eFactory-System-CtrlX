@@ -1,0 +1,6 @@
+!GlobalState
+assets:
+  build-packages: []
+  build-snaps:
+  - core22=2111
+  required-grade: stable

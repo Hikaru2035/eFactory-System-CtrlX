@@ -1,0 +1,16 @@
+!PrimeState
+dependency_paths: !!set {}
+directories: !!set
+  package-assets: null
+  package-assets/sdk-py-webserver: null
+files: !!set
+  package-assets/sdk-py-webserver/sdk-py-webserver.package-manifest.json: null
+primed_stage_packages: !!set {}
+project_options: {}
+properties:
+  override-prime: snapcraftctl prime
+  prime:
+  - '*'
+scriptlet_metadata: !ExtractedMetadata
+  _data: {}
+  common_id_list: []

@@ -1,0 +1,37 @@
+!PullState
+assets:
+  build-packages: !!set {}
+  build-snaps: !!set {}
+  source-details: null
+  stage-packages:
+  - libnorm1=1.5.9+dfsg-2
+  - libpgm-5.3-0=5.3.128~dfsg-2
+  - libsodium23=1.0.18-1build2
+  - libsystemd-dev=249.11-0ubuntu3.16
+  - libzmq5=4.3.4-2
+extracted_metadata:
+  files: []
+  metadata: !ExtractedMetadata
+    _data: {}
+    common_id_list: []
+project_options:
+  deb_arch: amd64
+properties:
+  override-pull: snapcraftctl pull
+  parse-info: []
+  plugin: python
+  source: .
+  source-branch: ''
+  source-commit: ''
+  source-depth: 0
+  source-subdir: ''
+  source-submodules: null
+  source-tag: ''
+  source-type: ''
+  stage-packages:
+  - libzmq5
+  - libsystemd-dev
+schema_properties: {}
+scriptlet_metadata: !ExtractedMetadata
+  _data: {}
+  common_id_list: []

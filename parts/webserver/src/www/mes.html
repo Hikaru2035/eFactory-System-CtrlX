@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eFactory System</title>
+    <link rel="stylesheet" href="/python-webserver/stylesheet.css">
+    <style>
+        /* layout */
+        .container {
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+            padding: 0 1vw;
+            height: 90vh;
+            gap: 2vh;
+        }
+
+        /* bảng trung tâm */
+        .table-wrapper {
+            flex: 1;
+            overflow-y: auto;     
+            overflow-x: auto;
+            height: 100%;
+        }
+        .main-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .main-table th, .main-table td {
+            border: 1px solid rgba(255,255,255,0.5);
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .main-table th {
+            background: #001B48;
+        }
+
+        /* panel phải */
+        .side-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        .dot-green {
+            background: #3ecf5c;
+        }
+        .card h3 {
+            margin-top: 0;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        /* placeholder chart */
+        .chart-placeholder {
+            height: 150px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="topbar">
+        <div class="topbar-left">
+            <img class="logo" src="/python-webserver/logo.png" alt="Logo">
+            <h2>eFactory System</h2>
+        </div>
+        <div class="nav">
+            <a href="/python-webserver?token=$(token)" class="chip">Home</a>
+            <a href="/python-webserver/scada.html?token=$(token)" class="chip">SCADA</a>
+            <a href="/python-webserver/mes.html?token=$(token)" class="chip">MES</a>
+            <a href="/python-webserver/cloud.html?token=$(token)" class="chip">Cloud</a>
+            <a href="/python-webserver/admin.html?token=$(token)" class="chip">Admin</a>
+        </div>
+    </div>
+    
+    <!-- Main content -->
+    <div class="container">
+    <!-- Left Card (DataLayer Table) -->
+    <div class="card">
+        <div class="table-wrapper">
+            <table class="main-table">
+                <thead>
+                    <tr>
+                        <th>Col 1</th>
+                        <th>Col 2</th>
+                        <th>Col 3</th>
+                        <th>Col 4</th>
+                        <th>Col 5</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Example table (empty) -->
+                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Right Cards (Cloud Connection + Baud Rate + Graphs)  -->
+    <div class="side-panel">
+        <div class="card">
+            <h3><span class="status-dot dot-green"></span> CLOUD CONNECTED</h3>
+        </div>
+        <div class="card">
+            <h3>BAUD RATE</h3>
+            <div class="chart-placeholder"></div>
+        </div>
+        <div class="card">
+            <h3>GRAPHS</h3>
+            <div class="chart-placeholder"></div>
+        </div>
+    </div>
+  </div>
+</body>
+</html>

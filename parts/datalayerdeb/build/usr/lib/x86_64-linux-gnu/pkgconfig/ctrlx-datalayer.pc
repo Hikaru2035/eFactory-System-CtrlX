@@ -1,0 +1,12 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${prefix}/lib/x86_64-linux-gnu
+includedir=${prefix}/include
+includedldir=${prefix}/include/comm/datalayer/c
+
+Name: ctrlx-datalayer
+Description: Debian package for ctrlx Data Layer
+Version: 2.9.8
+Libs: -L${libdir} -lcomm_datalayer
+Libs.private: -lstdc++  -lpthread -lrt -lcomm_datalayer
+Cflags: -I${includedir} -I${includedldir}

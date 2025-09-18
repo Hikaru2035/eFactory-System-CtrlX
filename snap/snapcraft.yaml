@@ -1,0 +1,71 @@
+name: sdk-py-webserver
+title: SDK Python Web Server
+version: 1.0.8
+summary: Web server Sample written in Python for ctrlX
+description: |
+  This sample shows how to create a web server app in ctrlX
+base: core22
+confinement: strict
+grade: stable
+
+apps:
+  webserver:
+    command: bin/main.py
+    plugs:
+      - network-bind
+      - active-solution
+      - datalayer
+    slots:
+      - package-assets
+      - package-run
+    daemon: simple
+
+parts:
+  webserver:
+    plugin: python
+    source: .
+    python-packages:
+      - websockets
+    stage-packages:
+      - libzmq5
+      # - ctrlx-datalayer
+      - libsystemd-dev
+
+  configs:
+    plugin: dump
+    source: ./configs
+    organize:
+      'package-assets/*': package-assets/${SNAPCRAFT_PROJECT_NAME}/
+  www:
+    plugin: dump
+    source: ./www
+    organize:
+      '*': www/ 
+  datalayerdeb:
+    plugin: dump
+    source: https://github.com/boschrexroth/ctrlx-automation-sdk/releases/download/3.6.0/ctrlx-datalayer-2.9.8.deb
+    source-type: deb
+
+slots:
+  package-assets:
+    interface: content
+    content: package-assets
+    source:
+      read:
+        - $SNAP/package-assets/${SNAPCRAFT_PROJECT_NAME}
+  package-run:
+    interface: content
+    content: package-run
+    source:
+      write:
+        - $SNAP_DATA/package-run/${SNAPCRAFT_PROJECT_NAME}
+
+plugs:
+  active-solution:
+    interface: content
+    content: solutions
+    target: $SNAP_COMMON/solutions
+  datalayer:
+    interface: content
+    content: datalayer
+    target: $SNAP_DATA/.datalayer

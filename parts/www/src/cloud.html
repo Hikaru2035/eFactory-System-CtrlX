@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eFactory System</title>
+    <link rel="stylesheet" href="/python-webserver/stylesheet.css">
+    <style>
+        :root {
+            --dark-blue: #001B48;
+            --main-blue: #003366;
+            --light-blue: rgba(214, 231, 238, 1);
+            --white: #ffffff;
+            --green: #18df18;
+            --red: #ff0000;
+            --gray: #bdc3c7;
+            --border-radius: 28px;
+        }
+        
+        /* Main content area */
+        .main-content-area {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0 1vw;
+            position: relative;
+            height: 90%;
+        }
+
+        .container {
+            background-blend-mode: overlay;
+            backdrop-filter: blur(130px);
+            -webkit-backdrop-filter: blur(130px);
+            border-radius: 12px;
+            padding: 20vh 1vw;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+            height: 100%;
+            background-color: #001B48; 
+            color: #D6E7EE; 
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            width: 100%;
+            max-width: 100vw; 
+        }
+
+        .section + .section {
+            margin-left: calc(100% / 24);
+        }
+
+        .section-1 {
+            flex: 0 0 auto;
+            padding-left: calc(100% / 16); 
+            display: flex;
+            justify-content: center;
+            align-items: center; 
+            min-width: 60px;
+        }
+
+        .section-2, .section-4 {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .section-3 {
+            flex: 0 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center; 
+            min-width: 60px;
+        }
+        
+        .section-5 {
+            flex: 0 0 auto;
+            padding-right: calc(100% / 16); 
+            display: flex;
+            align-items: center; 
+            justify-content: flex-end; 
+            min-width: 100px;
+        }
+
+        .section-5 button {
+            background-color: var(--light-blue);
+            color: var(--dark-blue);
+            border: none;
+            padding: 12px 25px;
+            font-size: 1em;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            border: 2px solid var(--light-blue);
+
+        }
+        
+        .section-5 button:hover {
+            color: var(--white);
+            background-color: var(--dark-blue);
+        }
+
+        .logo-inner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        
+        }
+        
+        .logo-aws, .logo-ctrlx {
+            height: 40px;
+            width: auto;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            background-color: var(--light-blue);
+            border-radius: var(--border-radius);
+            padding: 8px;
+            margin-bottom: 20px;
+        }
+
+        .input-group .status-dot {
+            height: 28px;
+            width: 28px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .input-group .status-dot.green { background-color: var(--green); }
+        .input-group .status-dot.red { background-color: var(--red); }
+
+        .input-group input {
+            background: none;
+            border: none;
+            color: var(--dark-blue);
+            font-size: 1em;
+            flex-grow: 1;
+            padding: 5px 0;
+        }
+
+        .input-group input:focus {
+            outline: none;
+        }
+
+        .info-list .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px dashed var(--light-blue);
+        }
+
+        .info-list .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-list .info-label {
+            font-weight: 400;
+            color: var(--white);
+        }
+
+        .info-list .info-value {
+            font-weight: 500;
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="topbar">
+        <div class="topbar-left">
+            <img class="logo" src="/python-webserver/logo.png" alt="Logo">
+            <h2>eFactory System</h2>
+        </div>
+        <div class="nav">
+            <a href="/python-webserver?token=$(token)" class="chip">Home</a>
+            <a href="/python-webserver/scada.html?token=$(token)" class="chip">SCADA</a>
+            <a href="/python-webserver/mes.html?token=$(token)" class="chip">MES</a>
+            <a href="/python-webserver/cloud.html?token=$(token)" class="chip">Cloud</a>
+            <a href="/python-webserver/admin.html?token=$(token)" class="chip">Admin</a>
+        </div>
+    </div>
+
+    <!-- Cloud Connection Details -->
+    <main class="main-content-area">
+        <div class="container">
+            <div class="section section-1">
+                <div class="logo-inner">
+                    <img class="logo-aws" src="aws.png" alt="AWS Logo">
+                </div>
+            </div>
+
+            <div class="section section-2">
+                <div class="input-group">
+                    <div class="status-dot green"></div>
+                    <input type="text" value="192.168.234.567" readonly>
+                </div>
+                <div class="info-list">
+                    <div class="info-item">
+                        <span class="info-label">Instance name</span>
+                        <span class="info-value">—</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Service status</span>
+                        <span class="info-value">—</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Instance Type</span>
+                        <span class="info-value">—</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Instance ID</span>
+                        <span class="info-value">—</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">AWS License(s)</span>
+                        <span class="info-value">—</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Security groups</span>
+                        <span class="info-value">—</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section section-3">
+                <div class="logo-inner">
+                    <img class="logo-ctrlx" src="aws.png" alt="CtrlX Logo">
+                </div>
+            </div>
+
+            <div class="section section-4">
+                <div class="input-group">
+                    <div class="status-dot red"></div>
+                    <input type="text" value="127.0.0.1" readonly>
+                </div>
+                <div class="info-list">
+                    <div class="info-item">
+                        <span class="info-label">Device name</span>
+                        <span class="info-value">—</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">System status</span>
+                        <span class="info-value">—</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Hardware platform</span>
+                        <span class="info-value">—</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Serial number</span>
+                        <span class="info-value">—</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Type code</span>
+                        <span class="info-value">—</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">App</span>
+                        <span class="info-value">—</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">License(s)</span>
+                        <span class="info-value">—</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Ports</span>
+                        <span class="info-value">—</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section section-5">
+                <button>Connect</button>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>

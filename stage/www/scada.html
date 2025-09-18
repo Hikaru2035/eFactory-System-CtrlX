@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eFactory System</title>
+    <link rel="stylesheet" href="/python-webserver/stylesheet.css">    <style>
+        /* ===== SCADA Layout ===== */
+        .factory-layout {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-top: 2vh;
+            padding: 0 1vw;
+            height: 95vh;
+        }
+
+        /* Ẩn toàn bộ card-info mặc định */
+     
+        .card.dot-mode {
+            background: #333 !important;  /* màu chấm */
+            width: 20px !important;
+            height: 20px !important;
+            border-radius: 50% !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+            overflow: visible !important;
+        }
+
+        .card {
+            background-color: rgba(151, 202, 219, 0.2);
+            background-blend-mode: overlay;
+            backdrop-filter: blur(130px);
+            -webkit-backdrop-filter: blur(130px);
+            border-radius: 12px;
+            padding: 1vh 1vw;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+            height: 100%;
+            min-height: 0;
+            overflow: hidden; /* không cho tràn */
+        }
+
+        .card-column {
+            display: grid;
+            grid-template-rows: repeat(4, 1fr);
+            gap: 2vh;
+            flex: 0 0 30%;
+            height: 88vh;
+        }
+
+        .card-column.left {
+            align-items: flex-end;
+        }
+
+        .card-column.right {
+            align-items: flex-start;
+        }
+
+        /* Ẩn nội dung khi ở dot mode */
+        .card.dot-mode .card-info {
+            display: none !important;
+        }
+
+        .card-info {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 2vh;
+        }
+
+        .card-info img {
+            width: 12vw;
+            height: 15vh;
+            border-radius: 9px;
+            background: #ddd;
+        }
+
+        .card-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-left: 4vh;
+        }
+
+        .status {
+            font-size: 2.5vh;
+            font-weight: 600;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: center;
+            color: #000;
+        }
+
+        .info p {
+            font-size: 2.5vh;
+            margin: 0.2em 0;
+            font-weight: 600;
+            color: #000;
+        }
+
+        .badge {
+            padding: 0.2em 0.8em;
+            border-radius: 999px;
+            font-size: 0.8em;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .badge.working {
+            background: #003366;
+            width: 80%;
+        }
+
+        .badge.standby {
+            background: #334488;
+            width: 80%;
+        }
+
+        .badge.off {
+            background: #111827;
+        }
+    </style> 
+</head>
+<body>
+    <!-- Header -->
+    <div class="topbar">
+        <div class="topbar-left">
+            <img class="logo" src="/python-webserver/logo.png" alt="Logo">
+            <h2>eFactory System</h2>
+        </div>
+        <div class="nav">
+            <a href="/python-webserver?token=$(token)" class="chip">Home</a>
+            <a href="/python-webserver/scada.html?token=$(token)" class="chip">SCADA</a>
+            <a href="/python-webserver/mes.html?token=$(token)" class="chip">MES</a>
+            <a href="/python-webserver/cloud.html?token=$(token)" class="chip">Cloud</a>
+            <a href="/python-webserver/admin.html?token=$(token)" class="chip">Admin</a>
+        </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="factory-layout">
+        <!-- Left Cards -->
+        <div class="card-column left">
+            <div class="card dot-mode">
+                <div class="card-info">
+                    <img>
+                    <div class="card-content">
+                    <div class="status"> 
+                        Status: 
+                        <span class="badge working">WORKING</span>
+                    </div>
+                    <div class="info">
+                        <p>Model: HF689X</p>
+                        <p>Year: 2025</p>
+                    </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card dot-mode">
+                <div class="card-info">
+                    <img>
+                    <div class="card-content">
+                    <div class="status"> 
+                        Status: 
+                        <span class="badge working">WORKING</span>
+                    </div>
+                    <div class="info">
+                        <p>Model: HF689X</p>
+                        <p>Year: 2025</p>
+                    </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card dot-mode">
+                <div class="card-info">
+                    <img>
+                    <div class="card-content">
+                    <div class="status"> 
+                        Status: 
+                        <span class="badge working">WORKING</span>
+                    </div>
+                    <div class="info">
+                        <p>Model: HF689X</p>
+                        <p>Year: 2025</p>
+                    </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card dot-mode">
+                <div class="card-info">
+                    <img>
+                    <div class="card-content">
+                    <div class="status"> 
+                        Status: 
+                        <span class="badge working">WORKING</span>
+                    </div>
+                    <div class="info">
+                        <p>Model: HF689X</p>
+                        <p>Year: 2025</p>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Cards -->
+        <div class="card-column right">
+            <div class="card dot-mode">
+                <div class="card-info">
+                    <img>
+                    <div class="card-content">
+                    <div class="status"> 
+                        Status: 
+                        <span class="badge working">WORKING</span>
+                    </div>
+                    <div class="info">
+                        <p>Model: HF689X</p>
+                        <p>Year: 2025</p>
+                    </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card dot-mode">
+                <div class="card-info">
+                    <img>
+                    <div class="card-content">
+                    <div class="status"> 
+                        Status: 
+                        <span class="badge working">WORKING</span>
+                    </div>
+                    <div class="info">
+                        <p>Model: HF689X</p>
+                        <p>Year: 2025</p>
+                    </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card dot-mode">
+                <div class="card-info">
+                    <img>
+                    <div class="card-content">
+                    <div class="status"> 
+                        Status: 
+                        <span class="badge working">WORKING</span>
+                    </div>
+                    <div class="info">
+                        <p>Model: HF689X</p>
+                        <p>Year: 2025</p>
+                    </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card dot-mode">
+                <div class="card-info">
+                    <img>
+                    <div class="card-content">
+                    <div class="status"> 
+                        Status: 
+                        <span class="badge working">WORKING</span>
+                    </div>
+                    <div class="info">
+                        <p>Model: HF689X</p>
+                        <p>Year: 2025</p>
+                    </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.card').forEach(card => {
+        // Khi click → bỏ chế độ dot, hiện card
+        card.addEventListener('click', () => {
+            card.classList.remove('dot-mode');
+        });
+
+        // Khi di chuột ra ngoài → quay lại dot
+        card.addEventListener('mouseleave', () => {
+            card.classList.add('dot-mode');
+        });
+        });
+    </script>
+</body>
+</html>

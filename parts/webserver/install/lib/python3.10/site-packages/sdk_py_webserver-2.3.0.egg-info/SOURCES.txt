@@ -1,0 +1,14 @@
+README.md
+main.py
+setup.cfg
+setup.py
+app/ctrlx_datalayer_helper.py
+app/datalayer.py
+sdk_py_webserver.egg-info/PKG-INFO
+sdk_py_webserver.egg-info/SOURCES.txt
+sdk_py_webserver.egg-info/dependency_links.txt
+sdk_py_webserver.egg-info/requires.txt
+sdk_py_webserver.egg-info/top_level.txt
+web/request_handler.py
+web/unix_socket_server.py
+web/web_token.py
