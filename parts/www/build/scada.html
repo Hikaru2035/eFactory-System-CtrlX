@@ -1,129 +1,183 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>eFactory System</title>
-    <link rel="stylesheet" href="/python-webserver/stylesheet.css">    <style>
-        /* ===== SCADA Layout ===== */
-        .factory-layout {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-top: 2vh;
-            padding: 0 1vw;
-            height: 95vh;
-        }
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/jpg" sizes="16x16" href="/python-webserver/favicon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>eFactory System</title>
+  <link rel="stylesheet" href="/python-webserver/stylesheet.css">    
+  <style>
+    /* ===== SCADA Layout ===== */
+    .factory-layout {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-top: 2vh;
+      padding: 0 1vw;
+      height: 95vh;
+    }
 
-        /* Ẩn toàn bộ card-info mặc định */
-     
-        .card.dot-mode {
-            background: #333 !important;  /* màu chấm */
-            width: 20px !important;
-            height: 20px !important;
-            border-radius: 50% !important;
-            padding: 0 !important;
-            box-shadow: none !important;
-            overflow: visible !important;
-        }
+    .card {
+      background-color: rgba(151, 202, 219, 0.2);
+      backdrop-filter: blur(130px);
+      border-radius: 12px;
+      padding: 1vh 1vw;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      box-sizing: border-box;
+      height: 100%;
+      overflow: hidden;
+      transition: 0.3s;
+    }
+    .card-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 2vh;
+    }
+    .card-content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-left: 4vh;
+    }
+    .status {
+      font-size: 2.5vh;
+      font-weight: 600;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      color: #000;
+    }
 
-        .card {
-            background-color: rgba(151, 202, 219, 0.2);
-            background-blend-mode: overlay;
-            backdrop-filter: blur(130px);
-            -webkit-backdrop-filter: blur(130px);
-            border-radius: 12px;
-            padding: 1vh 1vw;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            box-sizing: border-box;
-            height: 100%;
-            min-height: 0;
-            overflow: hidden; /* không cho tràn */
-        }
+    .info p {
+      font-size: 2.5vh;
+      margin: 0.2em 0;
+      font-weight: 600;
+      color: #000;
+    }
 
-        .card-column {
-            display: grid;
-            grid-template-rows: repeat(4, 1fr);
-            gap: 2vh;
-            flex: 0 0 30%;
-            height: 88vh;
-        }
+    .badge {
+      padding: 0.2em 0.8em;
+      border-radius: 999px;
+      font-size: 0.8em;
+      font-weight: bold;
+      color: #fff;
+    }
 
-        .card-column.left {
-            align-items: flex-end;
-        }
+    .badge.ok { background: #005f73; }
+    .badge.warn { background: #ca6702; }
 
-        .card-column.right {
-            align-items: flex-start;
-        }
+    /* ===== NAV CARD ===== */
+    .card.dark { background: #001B48; color: #fff; text-align: center; height: fit-content; padding: 2vh; border-radius: 100px; }
+    .oee-nav {
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0;
+      margin: 0;
+      font-size: 2.2vh;
+      font-weight: bold;
+    }
+    .oee-nav li {
+      cursor: pointer;
+      user-select: none;
+      padding: 0.5em 1.5em;
+      border-radius: 8px;
+      transition: 0.2s;
+    }
+    .oee-nav li:hover { background: rgba(255,255,255,0.2); color: #00b4d8; }
+    #factory-name { font-size: 2.4vh; font-weight: 700; color: #fff; }
+    .oee-nav-card {
+      position: fixed;
+      bottom: 2vh;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 30vw;
+      background: #001B48;
+      color: #fff;
+      border-radius: 34px;
+      padding: 1vh 0;
+      text-align: center;
+      z-index: 100;
+    }
 
-        /* Ẩn nội dung khi ở dot mode */
-        .card.dot-mode .card-info {
-            display: none !important;
-        }
+    .card-column {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around; /* tạo khoảng cách đều giữa các card */
+        align-items: stretch;
+        flex: 0 0 30%;
+        height: 88vh;
+    }
 
-        .card-info {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 2vh;
-        }
+    .machine-name {
+        font-size: 2.4vh;
+        font-weight: 700;
+        color: #002244;
+        margin-bottom: 1vh;
+    }
 
-        .card-info img {
-            width: 12vw;
-            height: 15vh;
-            border-radius: 9px;
-            background: #ddd;
-        }
+    .info p {
+    margin: 0.3em 0;
+    font-size: 2.2vh;
+    color: #000;
+    }
 
-        .card-content {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding-left: 4vh;
-        }
+    .machine-image {
+    margin-top: 1.5vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 15vh;
+    background: rgba(255,255,255,0.15);
+    border-radius: 8px;
+    overflow: hidden;
+    }
 
-        .status {
-            font-size: 2.5vh;
-            font-weight: 600;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            align-items: center;
-            color: #000;
-        }
+    .machine-image img {
+    height: 100%;
+    width: auto;
+    object-fit: contain;
+    border-radius: 8px;
+    }
+    .card-content {
+    display: flex;
+    flex-direction: row; /* Hiển thị ngang: ảnh bên trái, nội dung bên phải */
+    align-items: center;
+    gap: 2vw; /* Khoảng cách giữa ảnh và nội dung */
+    padding: 2vh 2vw;
+    }
 
-        .info p {
-            font-size: 2.5vh;
-            margin: 0.2em 0;
-            font-weight: 600;
-            color: #000;
-        }
+    .machine-image {
+    flex: 0 0 25%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 18vh;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    overflow: hidden;
+    }
 
-        .badge {
-            padding: 0.2em 0.8em;
-            border-radius: 999px;
-            font-size: 0.8em;
-            font-weight: bold;
-            color: #fff;
-        }
+    .machine-image img {
+    height: 100%;
+    width: auto;
+    object-fit: contain;
+    border-radius: 8px;
+    }
 
-        .badge.working {
-            background: #003366;
-            width: 80%;
-        }
+    .machine-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    }
 
-        .badge.standby {
-            background: #334488;
-            width: 80%;
-        }
-
-        .badge.off {
-            background: #111827;
-        }
-    </style> 
+  </style>
 </head>
 <body>
-    <!-- Header -->
+  <!-- Header -->
     <div class="topbar">
         <div class="topbar-left">
             <img class="logo" src="/python-webserver/logo.png" alt="Logo">
@@ -138,153 +192,171 @@
         </div>
     </div>
 
-    <!-- Main content -->
+  <!-- Main Layout -->
     <div class="factory-layout">
-        <!-- Left Cards -->
+
+        <!-- Left Column -->
         <div class="card-column left">
-            <div class="card dot-mode">
+            <!-- Machine A1 -->
+            <div class="card" id="machineA1">
                 <div class="card-info">
-                    <img>
-                    <div class="card-content">
-                    <div class="status"> 
-                        Status: 
-                        <span class="badge working">WORKING</span>
+                <div class="card-content">
+                    <div class="machine-image">
+                    <img src="/python-webserver/SL1_Sensor.png" alt="Sensor A Image" id="imageA1">
                     </div>
+                    <div class="machine-details">
+                    <h3 class="machine-name">Sensor A</h3>
+                    <div class="status">Status: <span id="statusA1" class="badge ok">OK</span></div>
                     <div class="info">
                         <p>Model: HF689X</p>
+                        <p>Position: <span id="sensorposA">--</span></p>
                         <p>Year: 2025</p>
                     </div>
                     </div>
                 </div>
+                </div>
             </div>
-            <div class="card dot-mode">
+
+            <!-- Machine A2 -->
+            <div class="card" id="machineA2">
                 <div class="card-info">
-                    <img>
-                    <div class="card-content">
-                    <div class="status"> 
-                        Status: 
-                        <span class="badge working">WORKING</span>
+                <div class="card-content">
+                    <div class="machine-image">
+                    <img src="/python-webserver/SL_3_ctrlx_drive.png" alt="Servo A Image" id="imageA2">
                     </div>
+                    <div class="machine-details">
+                    <h3 class="machine-name">Servo A</h3>
+                    <div class="status">Status: <span id="statusA2" class="badge ok">OK</span></div>
                     <div class="info">
                         <p>Model: HF689X</p>
+                        <p>Position: <span id="servoposA">--</span></p>
                         <p>Year: 2025</p>
                     </div>
                     </div>
                 </div>
+                </div>
             </div>
-            <div class="card dot-mode">
+        </div>
+
+        <!-- Right Column -->
+        <div class="card-column right">
+            <div class="card" id="machineB1">
                 <div class="card-info">
-                    <img>
-                    <div class="card-content">
-                    <div class="status"> 
-                        Status: 
-                        <span class="badge working">WORKING</span>
+                <div class="card-content">
+                    <div class="machine-image">
+                    <img src="/python-webserver/SL1_Sensor.png" alt="Sensor B Image" id="imageB1">
                     </div>
+                    <div class="machine-details">
+                    <h3 class="machine-name">Sensor B</h3>
+                    <div class="status">Status: <span id="statusB1" class="badge ok">OK</span></div>
                     <div class="info">
                         <p>Model: HF689X</p>
+                        <p>Position: <span id="sensorposB">--</span></p>
                         <p>Year: 2025</p>
                     </div>
                     </div>
                 </div>
+                </div>
             </div>
-            <div class="card dot-mode">
+
+            <div class="card" id="machineB2">
                 <div class="card-info">
-                    <img>
                     <div class="card-content">
-                    <div class="status"> 
-                        Status: 
-                        <span class="badge working">WORKING</span>
-                    </div>
-                    <div class="info">
-                        <p>Model: HF689X</p>
-                        <p>Year: 2025</p>
-                    </div>
+                        <div class="machine-image">
+                        <img src="/python-webserver/SL_3_ctrlx_drive.png" alt="Servo B Image" id="imageB2">
+                        </div>
+                        <div class="machine-details">
+                        <h3 class="machine-name">Servo B</h3>
+                        <div class="status">Status: <span id="statusB2" class="badge ok">OK</span></div>
+                        <div class="info">
+                            <p>Model: HF689X</p>
+                            <p>Position: <span id="servoposB">--</span></p>
+                            <p>Year: 2025</p>
+                        </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Right Cards -->
-        <div class="card-column right">
-            <div class="card dot-mode">
-                <div class="card-info">
-                    <img>
-                    <div class="card-content">
-                    <div class="status"> 
-                        Status: 
-                        <span class="badge working">WORKING</span>
-                    </div>
-                    <div class="info">
-                        <p>Model: HF689X</p>
-                        <p>Year: 2025</p>
-                    </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card dot-mode">
-                <div class="card-info">
-                    <img>
-                    <div class="card-content">
-                    <div class="status"> 
-                        Status: 
-                        <span class="badge working">WORKING</span>
-                    </div>
-                    <div class="info">
-                        <p>Model: HF689X</p>
-                        <p>Year: 2025</p>
-                    </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card dot-mode">
-                <div class="card-info">
-                    <img>
-                    <div class="card-content">
-                    <div class="status"> 
-                        Status: 
-                        <span class="badge working">WORKING</span>
-                    </div>
-                    <div class="info">
-                        <p>Model: HF689X</p>
-                        <p>Year: 2025</p>
-                    </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card dot-mode">
-                <div class="card-info">
-                    <img>
-                    <div class="card-content">
-                    <div class="status"> 
-                        Status: 
-                        <span class="badge working">WORKING</span>
-                    </div>
-                    <div class="info">
-                        <p>Model: HF689X</p>
-                        <p>Year: 2025</p>
-                    </div>
-                    </div>
-                </div>
-            </div>
-
+        <!-- Navigation card -->
+        <div class="card dark oee-nav-card">
+            <ul class="oee-nav">
+                <li id="prev-factory">Previous</li>
+                <li id="factory-name">Factory A</li>
+                <li id="next-factory">Next</li>
+            </ul>
         </div>
     </div>
 
-    <script>
-        document.querySelectorAll('.card').forEach(card => {
-        // Khi click → bỏ chế độ dot, hiện card
-        card.addEventListener('click', () => {
-            card.classList.remove('dot-mode');
-        });
+<script>
+    const token = "$(token)";
+    let currentFactory = "Factory A";
 
-        // Khi di chuột ra ngoài → quay lại dot
-        card.addEventListener('mouseleave', () => {
-            card.classList.add('dot-mode');
-        });
-        });
-    </script>
+    async function fetchData() {
+        try {
+            const res = await fetch(`/python-webserver/api/data?token=${token}`);
+            const data = await res.json();
+            return data;
+        } catch (err) {
+            console.error("Polling error:", err);
+            return null;
+        }
+    }
+
+    function updateBadge(id, status) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const s = (status || "OK").toUpperCase();
+        el.textContent = s;
+        el.className = "badge " + (s === "OK" || s === "WORKING" ? "ok" : "warn");
+    }
+
+    // --- Factory A ---
+    async function updateDataFactoryA() {
+        const data = await fetchData();
+        if (!data) return;
+        updateBadge("statusA1", data.driverStatus1);
+        updateBadge("statusA2", data.driverStatus2);
+        document.getElementById("sensorposA").textContent = data.servoPosA;
+        document.getElementById("servoposA").textContent = data.sensorPosA;
+    }
+
+    // --- Factory B ---
+    async function updateDataFactoryB() {
+        const data = await fetchData();
+        if (!data) return;
+        updateBadge("statusB1", data.driverStatus3);
+        updateBadge("statusB2", data.driverStatus4);
+        document.getElementById("sensorposB").textContent = data.servoPosB;
+        document.getElementById("servoposB").textContent = data.sensorPosB;
+    }
+
+    function switchFactory() {
+        const factoryNameEl = document.getElementById("factory-name");
+        if (currentFactory === "Factory A") {
+            currentFactory = "Factory B";
+            factoryNameEl.textContent = "Factory B";
+            updateDataFactoryB();
+        } else {
+            currentFactory = "Factory A";
+            factoryNameEl.textContent = "Factory A";
+            updateDataFactoryA();
+        }
+    }
+
+    document.getElementById("prev-factory").addEventListener("click", switchFactory);
+    document.getElementById("next-factory").addEventListener("click", switchFactory);
+
+    // Gọi lần đầu
+    updateDataFactoryA();
+
+    // Cập nhật định kỳ
+    setInterval(() => {
+        if (currentFactory === "Factory A") updateDataFactoryA();
+        else updateDataFactoryB();
+    }, 500);
+</script>
+
 </body>
 </html>

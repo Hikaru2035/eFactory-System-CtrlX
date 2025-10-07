@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>eFactory System</title>
+    <link rel="icon" type="image/jpg" sizes="16x16" href="/python-webserver/favicon.png">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
     <link rel="stylesheet" href="/python-webserver/stylesheet.css">
     <style>
         /* layout */
@@ -43,6 +46,42 @@
             flex-direction: column;
             gap: 20px;
         }
+        .cloud-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      height: 100%;               /* cho chiều cao khớp card */
+      padding-bottom: 6vh;        /* chừa khoảng trống cho nút */
+    }
+
+    .cloud-info {
+      font-size: 1.6vh;
+      margin: 1vh 0;
+      line-height: 1.4;
+    }
+
+    .btn-connect {
+      position: absolute;
+      bottom: 1.5vh;
+      right: 1.5vw;
+      background: #001B48;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 0.8vh 1.5vw;
+      font-size: 1.6vh;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+      border-radius: 23vh;
+    }
+
+    .btn-connect:hover {
+      background: linear-gradient(90deg, #43a047, #66bb6a);
+      transform: scale(1.05);
+    }
         .status-dot {
             width: 12px;
             height: 12px;
@@ -85,70 +124,167 @@
     
     <!-- Main content -->
     <div class="container">
-    <!-- Left Card (DataLayer Table) -->
-    <div class="card">
-        <div class="table-wrapper">
-            <table class="main-table">
-                <thead>
-                    <tr>
-                        <th>Col 1</th>
-                        <th>Col 2</th>
-                        <th>Col 3</th>
-                        <th>Col 4</th>
-                        <th>Col 5</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Example table (empty) -->
-                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
-                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
-                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
-                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
-                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
-                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
-                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
-                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
-                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
-                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
-                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
-                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
-                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
-                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
-                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
-                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
-                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
-                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
-                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
-                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
-                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
-                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
-                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
-                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
-                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
-                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
-                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
-                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
-                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
-                    <tr><td>...</td><td>...</td><td>...</td><td>...</td><td>...</td></tr>
-                </tbody>
-            </table>
+        <!-- Left Card (DataLayer Table) -->
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="main-table">
+                    <thead>
+                        <tr>
+                        <th>Parameter</th>
+                        <th>Enabled</th>
+                        <th>Address</th>
+                        <th>Value</th>
+                        <th>Note</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
-    </div>
 
-    <!-- Right Cards (Cloud Connection + Baud Rate + Graphs)  -->
-    <div class="side-panel">
-        <div class="card">
-            <h3><span class="status-dot dot-green"></span> CLOUD CONNECTED</h3>
-        </div>
-        <div class="card">
-            <h3>BAUD RATE</h3>
-            <div class="chart-placeholder"></div>
-        </div>
-        <div class="card">
-            <h3>GRAPHS</h3>
-            <div class="chart-placeholder"></div>
+        <!-- Right Cards (Cloud Connection + Baud Rate + Graphs)  -->
+        <div class="side-panel">
+            <div class="card cloud-card">
+                <h3>
+                <span class="status-dot dot-green"></span> CLOUD CONNECTED
+                </h3>
+
+                <div class="cloud-info">
+                <p><strong>Protocol:</strong> MQTT</p>
+                <p><strong>IP Address:</strong> 192.168.0.101</p>
+                <p><strong>Broker:</strong> a1b2c3d4e5-ats.iot.ap-southeast-1.amazonaws.com</p>
+                <p><strong>Last Sync:</strong> 2025-10-06 11:45:23</p>
+                </div>
+
+                <button class="btn-connect">Connect Data</button>
+            </div>
+            <div class="card">
+                <h3>BAUD RATE</h3>
+                <div class="chart-placeholder"></div>
+            </div>
+            <div class="card">
+                <h3>RUNNING SCHEDULE</h3>
+                <canvas id="scheduleChart"></canvas>
+            </div>
         </div>
     </div>
-  </div>
+<script>
+    new Chart(document.getElementById('scheduleChart'), {
+            type: 'bar',
+            data: {
+                labels: ['01/01','02/01','03/01','04/01','05/01','06/01','07/01'],
+                datasets: [{
+                data: [20,12,22,21,19,10,23],
+                backgroundColor: '#001B48'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                legend: { display: false },
+                datalabels: {
+                    anchor: 'end',
+                    align: 'end',
+                    color: '#001B48',
+                    font: { weight: 'bold' }
+                }
+                },
+                scales: {
+                x: {
+                    ticks: {
+                    color: '#001B48',
+                    font: { size: 12 }
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                    color: '#001B48'
+                    }
+                }
+                }
+            },
+            plugins: [ChartDataLabels]
+        });
+    
+    const token = "$(token)";
+    const tableBody = document.querySelector(".main-table tbody");
+
+    // Danh sách thông số và ánh xạ tới key JSON
+    const dataMapping = [
+        // Factory A
+        { name: "Availability", address: "plc/app/Application/sym/PLC_PRG/oeeAvail1", note: "Factory A", key: "availabilityA" },
+        { name: "Performance",  address: "plc/app/Application/sym/PLC_PRG/oeePerf1",  note: "Factory A", key: "performanceA" },
+        { name: "Quality",      address: "plc/app/Application/sym/PLC_PRG/oeeQual1",  note: "Factory A", key: "qualityA" },
+        { name: "OEE Total",    address: "plc/app/Application/sym/PLC_PRG/oeeTotal1", note: "Factory A", key: "oeeA" },
+        { name: "Temperature",  address: "plc/app/Application/sym/PLC_PRG/tempInside1 + tempOutside1", note: "Factory A (avg)", key: "temperatureA" },
+        { name: "Humidity",     address: "plc/app/Application/sym/PLC_PRG/humidityInside1 + humidityOutside1", note: "Factory A (avg)", key: "humidityA" },
+        { name: "Servo 1",      address: "plc/app/Application/sym/PLC_PRG/servoPos1", note: "Factory A", key: "servo1" },
+        { name: "Servo 2",      address: "plc/app/Application/sym/PLC_PRG/servoPos2", note: "Factory A", key: "servo2" },
+        { name: "Driver Status 1", address: "plc/app/Application/sym/PLC_PRG/servoStatus1", note: "Factory A", key: "driverStatus1" },
+        { name: "Driver Status 2", address: "plc/app/Application/sym/PLC_PRG/servoStatus2", note: "Factory A", key: "driverStatus2" },
+
+        // Factory B
+        { name: "Availability", address: "plc/app/Application/sym/PLC_PRG/oeeAvail2", note: "Factory B", key: "availabilityB" },
+        { name: "Performance",  address: "plc/app/Application/sym/PLC_PRG/oeePerf2",  note: "Factory B", key: "performanceB" },
+        { name: "Quality",      address: "plc/app/Application/sym/PLC_PRG/oeeQual2",  note: "Factory B", key: "qualityB" },
+        { name: "OEE Total",    address: "plc/app/Application/sym/PLC_PRG/oeeTotal2", note: "Factory B", key: "oeeB" },
+        { name: "Temperature",  address: "plc/app/Application/sym/PLC_PRG/tempInside2 + tempOutside2", note: "Factory B (avg)", key: "temperatureB" },
+        { name: "Humidity",     address: "plc/app/Application/sym/PLC_PRG/humidityInside2 + humidityOutside2", note: "Factory B (avg)", key: "humidityB" },
+        { name: "Servo 3",      address: "plc/app/Application/sym/PLC_PRG/servoPos3", note: "Factory B", key: "servo3" },
+        { name: "Servo 4",      address: "plc/app/Application/sym/PLC_PRG/servoPos4", note: "Factory B", key: "servo4" },
+        { name: "Driver Status 3", address: "plc/app/Application/sym/PLC_PRG/servoStatus3", note: "Factory B", key: "driverStatus3" },
+        { name: "Driver Status 4", address: "plc/app/Application/sym/PLC_PRG/servoStatus4", note: "Factory B", key: "driverStatus4" },
+    ];
+
+    async function fetchData() {
+        try {
+            const res = await fetch(`/python-webserver/api/data?token=${token}`);
+            if (!res.ok) throw new Error("Network error");
+            return await res.json();
+        } catch (err) {
+            console.error("❌ Fetch error:", err);
+            return null;
+        }
+    }
+
+    async function updateTable() {
+        const data = await fetchData();
+        if (!data) return;
+
+        tableBody.innerHTML = "";
+
+        dataMapping.forEach(item => {
+            const tr = document.createElement("tr");
+
+            const tdName = document.createElement("td");
+            tdName.textContent = item.name;
+
+            const tdCheck = document.createElement("td");
+            const checkbox = document.createElement("input");
+            checkbox.type = "checkbox";
+            checkbox.checked = true;
+            tdCheck.appendChild(checkbox);
+
+            const tdAddr = document.createElement("td");
+            tdAddr.textContent = item.address;
+
+            const tdValue = document.createElement("td");
+            tdValue.textContent = data[item.key] !== undefined ? data[item.key] : "--";
+
+            const tdNote = document.createElement("td");
+            tdNote.textContent = item.note;
+
+            tr.append(tdName, tdCheck, tdAddr, tdValue, tdNote);
+            tableBody.appendChild(tr);
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        updateTable();
+        setInterval(updateTable, 5000);
+    });
+</script>
+
 </body>
 </html>

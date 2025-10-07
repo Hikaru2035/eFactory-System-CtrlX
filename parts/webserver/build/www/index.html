@@ -30,7 +30,13 @@
         <!-- Left Top Cards (OEE + OBJ Moni) -->
         <div class="left-top">
             <div class="blank"></div>
-
+            <div class="card dark">
+                <ul class="oee-nav">
+                    <li id="prev-factory">Previous</li>
+                    <li id="factory-name">Factory A</li>
+                    <li id="next-factory">Next</li>
+                </ul>
+            </div>
             <div class="card dark">
                 <h3>MACHINE OEE</h3>
                 <div class="oee-column">
@@ -42,33 +48,35 @@
                         <li><span class="label">Quality</span><span class="value" id="quality">--</span></li>
                         </ul>
                     </div>
-                    <ul class="oee-nav">
-                        <li>Previous</li>
-                        <li>Factory A</li>
-                        <li>Next</li>
-                    </ul>
                 </div>
             </div>
-
             <div class="card">
                 <h3>OBJECT PLACEMENT MONITORING</h3>
                 <div class="object-grid">
-                <div class="obj-item">
-                    35<br />Object1<br /><span class="badge ok">✓</span>
-                </div>
-                <div class="obj-item">
-                    35<br />Object2<br /><span class="badge ok">✓</span>
-                </div>
-                <div class="obj-item">
-                    35<br />Object3<br /><span class="badge warn">!</span>
-                </div>
-                <div class="obj-item">
-                    35<br />Object4<br /><span class="badge ok">✓</span>
-                </div>
+                    <div class="obj-item">
+                        <span class="servo-title">Servo A</span>    
+                        <br/>Status<br >
+                        <span id="servo1-status" class="badge"></span>
+                    </div>
+                    <div class="obj-item">
+                        <span class="servo-title">Servo B</span>
+                        <br/>Status<br/>
+                        <span id="servo2-status" class="badge"></span>
+                    </div>
+                    <div class="obj-item">
+                        <span class="servo-title">Sensor A</span>
+                        <br/>Status<br/>
+                        <span id="sensor1-status" class="badge"></span>
+                    </div>
+                    <div class="obj-item">
+                        <span class="servo-title">Sensor B</span>
+                        <br/>Status<br/>
+                        <span id="sensor2-status" class="badge"></span>
+                    </div>
                 </div>
             </div>
         </div>
-
+        
         <!-- Left Bottom Card (Environment Moni) -->
         <div class="left-bottom">
             <div class="card">
@@ -99,11 +107,9 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Location</th>
-                                <th>Order Date</th>
-                                <th>Status</th>
-                                <th>Amount</th>
+                                <th>Time</th>
+                                <th>Description</th>
+                                <th>Type</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -191,35 +197,141 @@
             plugins: [gaugeText]
             });
         }
-        
-        const token = "$(token)"; // server đã render token
 
+        function updateServoStatus(elementId, status) {
+            console.log(`🔍 [DEBUG] ${elementId} status raw:`, status); // Log ra console
+
+            const badge = document.getElementById(elementId);
+            if (!badge) {
+                console.warn(`⚠️ [DEBUG] Element not found: ${elementId}`);
+                return;
+            }
+
+            // Nếu PLC trả về object kiểu { "Implicit_Enum__PLC_PRG__servoStatus1": "NORMAL" }
+            if (typeof status === "object" && status !== null) {
+                const firstKey = Object.keys(status)[0];
+                status = status[firstKey];
+                console.log(`✅ Extracted status for ${elementId}:`, status);
+            }
+
+            // Chuẩn hóa
+            status = String(status || "").toUpperCase();
+
+            switch (status) {
+                case "WORKING":
+                case "NORMAL":
+                    badge.textContent = "✓";
+                    badge.className = "badge ok";
+                    break;
+
+                case "STANDBY":
+                case "ERROR":
+                case "FAULT":
+                    badge.textContent = "!";
+                    badge.className = "badge warn";
+                    break;
+
+                default:
+                    badge.textContent = "✓";
+                    badge.className = "badge ok";
+                    console.warn(`❓ Unknown status for ${elementId}: "${status}"`);
+                    break;
+            }
+        }
+
+
+        const token = "$(token)"; // server render token
         const tempGauge = createGauge(document.getElementById('tempGauge'), 0, '#018ABE', '℃');
         const humidityGauge = createGauge(document.getElementById('humidityGauge'), 0, '#018ABE', '%');
 
-        function updateData() {
-            fetch(`/python-webserver/api/data?token=${token}`)
-                .then(res => res.json())
-                .then(data => {
-                    // Update OEE text
-                    document.getElementById("availability").textContent = data.availability;
-                    document.getElementById("performance").textContent = data.performance;
-                    document.getElementById("quality").textContent = data.quality;
-                    document.getElementById("oee").textContent = data.oee;
+        let currentFactory = "Factory A";
 
-                    // Update Gauges
-                    tempGauge.data.datasets[0].data = [data.temperature, 100 - data.temperature];
-                    tempGauge.update();
-
-                    humidityGauge.data.datasets[0].data = [data.humidity, 100 - data.humidity];
-                    humidityGauge.update();
-                })
-                .catch(err => console.error("Polling error:", err));
+        // Hàm đọc data chung (chỉ fetch 1 lần)
+        async function fetchData() {
+            try {
+                const res = await fetch(`/python-webserver/api/data?token=${token}`);
+                const data = await res.json();
+                return data;
+            } catch (err) {
+                console.error("Polling error:", err);
+                return null;
+            }
         }
 
-        updateData();
-        setInterval(updateData, 1000);
+        // Factory A
+        async function updateDataFactoryA() {
+            const data = await fetchData();
+            if (!data) return;
 
+            document.getElementById("availability").textContent = data.availabilityA;
+            document.getElementById("performance").textContent = data.performanceA;
+            document.getElementById("quality").textContent = data.qualityA;
+            document.getElementById("oee").textContent = data.oeeA;
+
+            // Gauges
+            tempGauge.data.datasets[0].data = [data.temperatureA, 100 - data.temperatureA];
+            tempGauge.update();
+            humidityGauge.data.datasets[0].data = [data.humidityA, 100 - data.humidityA];
+            humidityGauge.update();
+
+            // Status
+            updateServoStatus("servo1-status", data.driverStatus1);
+            updateServoStatus("servo2-status", data.driverStatus2);
+            updateServoStatus("sensor1-status", data.driverStatus1);
+            updateServoStatus("sensor2-status", data.driverStatus2);
+        }
+
+        // Factory B
+        async function updateDataFactoryB() {
+            const data = await fetchData();
+            if (!data) return;
+
+            document.getElementById("availability").textContent = data.availabilityB;
+            document.getElementById("performance").textContent = data.performanceB;
+            document.getElementById("quality").textContent = data.qualityB;
+            document.getElementById("oee").textContent = data.oeeB;
+
+            // Gauges
+            tempGauge.data.datasets[0].data = [data.temperatureB, 100 - data.temperatureB];
+            tempGauge.update();
+            humidityGauge.data.datasets[0].data = [data.humidityB, 100 - data.humidityB];
+            humidityGauge.update();
+
+            // Servo
+            document.getElementById("servo3-value").textContent = data.servo3;
+            document.getElementById("servo4-value").textContent = data.servo4;
+
+            // Status
+            updateServoStatus("servo3-status", data.driverStatus3);
+            updateServoStatus("servo4-status", data.driverStatus4);
+        }
+
+        // Hàm đổi Factory
+        function switchFactory() {
+            const factoryNameEl = document.getElementById("factory-name");
+
+            if (currentFactory === "Factory A") {
+                currentFactory = "Factory B";
+                factoryNameEl.textContent = "Factory B";
+                updateDataFactoryB();
+            } else {
+                currentFactory = "Factory A";
+                factoryNameEl.textContent = "Factory A";
+                updateDataFactoryA();
+            }
+        }
+
+        document.getElementById("prev-factory").addEventListener("click", switchFactory);
+        document.getElementById("next-factory").addEventListener("click", switchFactory);
+
+        // Gọi khởi tạo
+        updateDataFactoryA();
+
+        // Tùy chọn: refresh định kỳ
+        setInterval(() => {
+            if (currentFactory === "Factory A") updateDataFactoryA();
+            else updateDataFactoryB();
+        }, 500);
     </script>
 </body>
 </html>

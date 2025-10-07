@@ -2,5 +2,5 @@
 assets:
   build-packages: []
   build-snaps:
-  - core22=2111
+  - core22=2133
   required-grade: stable

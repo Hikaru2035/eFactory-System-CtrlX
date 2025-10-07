@@ -11,12 +11,13 @@ html, body {
 
 /* Header */
 .topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 8vh; /* header chiếm 8% chiều cao màn hình */
-    padding: 0 1vw;
-    box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 8vh; 
+  padding: 0 1vw;
+  box-sizing: border-box;
+  pointer-events: auto;
 }
 .topbar-left { display: flex; align-items: center; gap: 1vw; }
 .topbar img.logo { height: 8vh; }
@@ -24,35 +25,29 @@ html, body {
 .nav { display: flex; gap: 1vw; }
 .nav .chip { padding: 0.5vh 1vw; border-radius: 999px; background: rgba(0,0,0,0.05); cursor: pointer; font-size: 1.5vh; font-weight: 800; text-decoration: none; color: inherit; }
 
-/* Layout chính */
+/* Main Layout */
 .stage {
-    display: grid;
-    grid-template-columns: 1fr 3fr; /* cột trái & cột phải */
-    grid-template-rows: 2.5fr 1fr;    /* chia theo tỉ lệ chiều cao */
-    gap: 1vh;
-    padding: 2vh;
-    height: 92vh; /* còn lại sau header */
-    box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 1fr 3fr; 
+  grid-template-rows: 2.5fr 1fr;   
+  gap: 1vh;
+  padding: 2vh;
+  height: 92vh;
+  box-sizing: border-box;
 }
-
-/* Cột trái trên */
 .left-top {
-    grid-column: 1 / 2;
-    grid-row: 1 / 2;
-    display: grid;
-    grid-template-rows: .5fr 1fr 1fr;
-    gap: 1vh;
-    min-height: 0; /* ngăn overflow */
+  grid-column: 1 / 2;
+  grid-row: 1 / 2;
+  display: grid;
+  grid-template-rows: .5fr .2fr 1fr 1fr;
+  gap: 1vh;
+  min-height: 0;
 }
-
-/* Cột trái dưới */
 .left-bottom {
     grid-column: 1 / 2;
     grid-row: 2 / 3;
     min-height: 0;
 }
-
-/* Cột phải dưới */
 .right-bottom {
     grid-column: 2 / 3;
     grid-row: 2 / 3;
@@ -62,7 +57,7 @@ html, body {
     min-height: 0;
 }
 
-/* Card chung */
+/* General Card */
 .card {
   background-color: rgba(151, 202, 219, 0.2);
   background-blend-mode: overlay;
@@ -76,12 +71,7 @@ html, body {
   min-height: 0;
   overflow: hidden; /* không cho tràn */
 }
-.card h3 {
-  margin: 0 0 0.5vh;
-  font-size: 2vh;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-}
+.card h3 { margin: 0 0 0.5vh; font-size: 2vh; letter-spacing: .08em; text-transform: uppercase; }
 
 /* OEE */
 .card.dark { background-color: #001B48; color: #D6E7EE; }
@@ -107,51 +97,36 @@ html, body {
 .oee-list li { display: flex;  justify-content: space-between; align-items: center; width: 100%; }
 .oee-list .label { text-align: left; }
 .oee-list .value { text-align: right; font-weight: bold; }
-.oee-nav { 
-  flex: 0 0 20%; 
-  display: flex; 
-  justify-content: space-between; 
-  align-items: center; 
-  font-size: 1.2vh; 
-  padding: 0 1vw;
+.oee-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.8vh;
+  font-weight: 700;
+  margin: 0 0 0.5vh;
+  padding: 0;              
+  list-style: none;        
+  width: 100%;            
+  text-align: center;
 }
 .oee-nav li { list-style: none; cursor: pointer; }
 
 /* Object placement */
 .object-grid { display: flex; justify-content: space-around; align-items: center; height: 90%; }
-.obj-item { text-align: center; font-size: 1.4vh; }
+.obj-item { text-align: center; font-size: 1.8vh; font-weight: 700; }
+.obj-item .servo-title {font-size: 2vh; font-weight: 800; }
 .badge { display: inline-block; margin-top: 1vh; width: 4vh; height: 4vh; border-radius: 50%; line-height: 4vh; font-weight: bold; font-size: 2.4vh; }
 .badge.ok { background: #4cd964; color: #fff; }
 .badge.warn { background: #ffc107; color: #000; }
 
 /* Env Monitoring */
-.env-charts {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  height: 90%;
-}
-.gauge-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.gauge-label {
-  margin-top: 8px;
-  font-size: 14px;
-  font-weight: 800;
-  color: #001B48;
-}
-.env-charts canvas { 
-  width: 15vh !important; 
-  height: 15vh !important; 
-}
+.env-charts { display: flex; justify-content: space-around; align-items: center; height: 90%; }
+.gauge-container { display: flex; flex-direction: column; align-items: center; }
+.gauge-label { margin-top: 8px; font-size: 14px; font-weight: 800; color: #001B48; }
+.env-charts canvas {  width: 15vh !important;  height: 15vh !important; }
 
 /* Running Schedule */
-#scheduleChart {
-  width: 100% !important;
-  height: 90% !important;
-}
+#scheduleChart { width: 100% !important; height: 90% !important; }
 
 /* Errors log*/
 .table_body{
@@ -195,12 +170,6 @@ thead th {
 tbody tr:nth-child(even){
     background-color: rgba(0, 27, 72, 0.2);
 }
-
-/*tbody tr:hover{
-    background-color: #fff6;
-}*/
-
-/* Responsive */
   @media (max-width: 1024px) {
 .stage { grid-template-columns: 1fr; grid-template-rows: auto auto auto; }
 .right-bottom { grid-template-columns: 1fr; }

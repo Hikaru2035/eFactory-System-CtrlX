@@ -2,6 +2,10 @@
 directories: !!set
   www: null
 files: !!set
+  www/SL1_Sensor.png: null
+  www/SL1_ctrlx_core_trans.png: null
+  www/SL_3_ctrlx_drive.png: null
+  www/admin.html: null
   www/background001.png: null
   www/cloud.html: null
   www/favicon.png: null

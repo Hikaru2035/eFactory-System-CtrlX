@@ -1,6 +1,6 @@
 name: sdk-py-webserver
-version: 1.0.8
-summary: Web server Sample written in Python for ctrlX
+version: 1.1.11
+summary: Web server written in Python for ctrlX
 description: 'This sample shows how to create a web server app in ctrlX
 
   '
@@ -46,4 +46,4 @@ slots:
     source:
       write:
       - $SNAP_DATA/package-run/sdk-py-webserver
-title: SDK Python Web Server
+title: eFactory Dashboard

@@ -125,31 +125,74 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                 self.send_response_and_header(401, 'application/json')
                 self.wfile.write(b'{"error": "invalid token"}')
                 return
+            
+            def extract_enum_value(enum_dict):
+                if isinstance(enum_dict, dict) and len(enum_dict) > 0:
+                    return list(enum_dict.values())[0]
+                return str(enum_dict)
 
-            # Đọc từ DataLayer
-            result, availability_val = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeeAvail1")
-            result, performance_val = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeePerf1")
-            result, quality_val     = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeeQual1")
-            result, total_val     = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeeTotal1")
-            result, temp_val       = data_layer.read_node("plc/app/Application/sym/PLC_PRG/tempInside1")
-            result, humidity_val   = data_layer.read_node("plc/app/Application/sym/PLC_PRG/humidityInside1")
+            # Đọc dữ liệu từ DataLayer
+            # ------------------------- FACTORY A -------------------------
+            result, availabilityA_val = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeeAvail1")
+            result, performanceA_val  = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeePerf1")
+            result, qualityA_val      = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeeQual1")
+            result, totalA_val        = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeeTotal1")
+            result, tempinsideA_val   = data_layer.read_node("plc/app/Application/sym/PLC_PRG/tempInside1")
+            result, tempoutsideA_val  = data_layer.read_node("plc/app/Application/sym/PLC_PRG/tempOutside1")
+            result, humidityinA_val   = data_layer.read_node("plc/app/Application/sym/PLC_PRG/humidityInside1")
+            result, humidityoutA_val  = data_layer.read_node("plc/app/Application/sym/PLC_PRG/humidityOutside1")
+            result, servo1_val        = data_layer.read_node("plc/app/Application/sym/PLC_PRG/servoPos1")
+            result, servo2_val        = data_layer.read_node("plc/app/Application/sym/PLC_PRG/servoPos2")
+            result, status1_val       = data_layer.read_node("plc/app/Application/sym/PLC_PRG/servoStatus1")
+            result, status2_val       = data_layer.read_node("plc/app/Application/sym/PLC_PRG/servoStatus2")
 
+            # ------------------------- FACTORY B -------------------------
+            result, availabilityB_val = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeeAvail2")
+            result, performanceB_val  = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeePerf2")
+            result, qualityB_val      = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeeQual2")
+            result, totalB_val        = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeeTotal2")
+            result, tempinsideB_val   = data_layer.read_node("plc/app/Application/sym/PLC_PRG/tempInside2")
+            result, tempoutsideB_val  = data_layer.read_node("plc/app/Application/sym/PLC_PRG/tempOutside2")
+            result, humidityinB_val   = data_layer.read_node("plc/app/Application/sym/PLC_PRG/humidityInside2")
+            result, humidityoutB_val  = data_layer.read_node("plc/app/Application/sym/PLC_PRG/humidityOutside2")
+            result, servo3_val        = data_layer.read_node("plc/app/Application/sym/PLC_PRG/servoPos3")
+            result, servo4_val        = data_layer.read_node("plc/app/Application/sym/PLC_PRG/servoPos4")
+            result, status3_val       = data_layer.read_node("plc/app/Application/sym/PLC_PRG/servoStatus3")
+            result, status4_val       = data_layer.read_node("plc/app/Application/sym/PLC_PRG/servoStatus4")
 
-            # Gửi JSON về client
+            # ------------------------- JSON RESPONSE -------------------------
             response = {
-                "availability": round(availability_val),
-                "performance": round(performance_val),
-                "quality": round(quality_val),
-                "oee": round(total_val),
-                "temperature": round(temp_val),
-                "humidity": round(humidity_val)
+                # Factory A
+                "availabilityA": round(availabilityA_val),
+                "performanceA": round(performanceA_val),
+                "qualityA": round(qualityA_val),
+                "oeeA": round(totalA_val),
+                "temperatureA": round((tempinsideA_val + tempoutsideA_val)/2),
+                "humidityA": round((humidityinA_val + humidityoutA_val)/2),
+                "servoPosA": round(servo1_val,2),
+                "sensorPosA": round(servo2_val,2),
+                "driverStatus1": extract_enum_value(status1_val),
+                "driverStatus2": extract_enum_value(status2_val),
+
+                # Factory B
+                "availabilityB": round(availabilityB_val),
+                "performanceB": round(performanceB_val),
+                "qualityB": round(qualityB_val),
+                "oeeB": round(totalB_val),
+                "temperatureB": round((tempinsideB_val + tempoutsideB_val)/2),
+                "humidityB": round((humidityinB_val + humidityoutB_val)/2),
+                "servoPosB": round(servo3_val,2),
+                "sensorPosB": round(servo4_val,2),
+                "driverStatus3": extract_enum_value(status3_val),
+                "driverStatus4": extract_enum_value(status4_val)
             }
 
-
+            # Gửi về client
             import json
             self.send_response_and_header(200, 'application/json')
             self.wfile.write(json.dumps(response).encode("utf-8"))
             return
+
         
         # HTML
         if self.path.startswith("/python-webserver"):
@@ -230,28 +273,12 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
             htmlX = htmlX.replace('$(permissions_r)', str(
                 permissions_json['rexroth-python-webserver.web.r']))
             
-            # (giá trị mẫu, có thể lấy từ DataLayer hoặc DB)
-            # Đọc Availability
-            #result, availability_val = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeeAvail1")
-            # Đọc Performance
-            #result, performance_val = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeePerf1")
-            # Đọc Quality
-            #result, quality_val = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeeQual1")
             schedule_data = "[12, 19, 3, 5, 2, 3, 10, 15, 7, 8, 12, 14]"
-            avg_temp = "65"
-            avg_humidity = "45"
             error_rows = """
-                <tr><td>1</td><td>Line 1</td><td>2025-09-05</td><td>Pending</td><td>50</td></tr>
-                <tr><td>2</td><td>Line 2</td><td>2025-09-05</td><td>Resolved</td><td>20</td></tr>
+                <tr><td>12:23:34</td><td>Line 1</td><td>Error</td></tr>
+                <tr><td>09:45:23</td><td>Line 2</td><td>Warn</td></tr>
             """
-
-            # Thay placeholder trong HTML
-            #htmlX = htmlX.replace("$(availability)", str(availability_val))
-            #htmlX = htmlX.replace("$(performance)", str(performance_val))
-            #htmlX = htmlX.replace("$(quality)", str(quality_val))
             htmlX = htmlX.replace("$(schedule_data)", schedule_data)
-            htmlX = htmlX.replace("$(avg_temp)", avg_temp)
-            htmlX = htmlX.replace("$(avg_humidity)", avg_humidity)
             htmlX = htmlX.replace("$(error_rows)", error_rows)
 
             self.wfile.write(htmlX.encode("utf-8"))
