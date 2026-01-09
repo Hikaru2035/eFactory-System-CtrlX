@@ -1,0 +1,41 @@
+############################
+# Python
+############################
+__pycache__/
+*.py[cod]
+.env
+.venv
+venv/
+
+############################
+# Secrets / Certs
+############################
+app/certs/*.key
+app/certs/*.pem
+app/certs/*.crt
+app/certs/*.pub
+
+############################
+# Snap build
+############################
+*.snap
+prime/
+stage/
+parts/
+
+############################
+# Runtime / data
+############################
+data/
+*.log
+*.pid
+
+############################
+# OS / Editor
+############################
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+aws-iot-device-sdk-python-v2/
