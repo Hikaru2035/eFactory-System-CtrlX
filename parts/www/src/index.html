@@ -199,7 +199,7 @@
         }
 
         function updateServoStatus(elementId, status) {
-            console.log(`🔍 [DEBUG] ${elementId} status raw:`, status); // Log ra console
+            console.log(`🔍 [DEBUG] ${elementId} status raw:`, status);
 
             const badge = document.getElementById(elementId);
             if (!badge) {
@@ -207,16 +207,30 @@
                 return;
             }
 
-            // Nếu PLC trả về object kiểu { "Implicit_Enum__PLC_PRG__servoStatus1": "NORMAL" }
+            // 1️⃣ Nếu status là STRING nhưng có dạng JSON → parse
+            if (typeof status === "string") {
+                const trimmed = status.trim();
+                if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
+                    try {
+                        status = JSON.parse(trimmed);
+                        console.log(`🧩 Parsed JSON status for ${elementId}:`, status);
+                    } catch (e) {
+                        console.error(`❌ JSON parse failed for ${elementId}:`, e);
+                    }
+                }
+            }
+
+            // 2️⃣ Nếu status là OBJECT → lấy value đầu tiên
             if (typeof status === "object" && status !== null) {
                 const firstKey = Object.keys(status)[0];
                 status = status[firstKey];
                 console.log(`✅ Extracted status for ${elementId}:`, status);
             }
 
-            // Chuẩn hóa
+            // 3️⃣ Chuẩn hóa string
             status = String(status || "").toUpperCase();
 
+            // 4️⃣ Mapping trạng thái
             switch (status) {
                 case "WORKING":
                 case "NORMAL":
@@ -232,8 +246,8 @@
                     break;
 
                 default:
-                    badge.textContent = "✓";
-                    badge.className = "badge ok";
+                    badge.textContent = "?";
+                    badge.className = "badge";
                     console.warn(`❓ Unknown status for ${elementId}: "${status}"`);
                     break;
             }
@@ -304,6 +318,8 @@
             // Status
             updateServoStatus("servo3-status", data.driverStatus3);
             updateServoStatus("servo4-status", data.driverStatus4);
+
+            console.log("[ctrlX][FactoryB] driverStatus4 =", data.driverStatus4);
         }
 
         // Hàm đổi Factory

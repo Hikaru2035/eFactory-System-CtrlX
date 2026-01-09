@@ -2,12 +2,12 @@
 assets:
   installed-packages: []
   installed-snaps:
-  - core20=2669
-  - core22=2133
-  - lxd=35819
+  - core20=2686
+  - core22=2193
+  - lxd=36918
   - snapcraft=7201
-  - snapd=25202
-  uname: 'Linux 5.15.0-157-generic #167-Ubuntu SMP Wed Sep 17 21:35:53 UTC 2025 x86_64
+  - snapd=25935
+  uname: 'Linux 5.15.0-164-generic #174-Ubuntu SMP Fri Nov 14 20:25:16 UTC 2025 x86_64
     x86_64 x86_64 GNU/Linux'
 extracted_metadata:
   files: []

@@ -13,9 +13,10 @@ from urllib.parse import unquote, parse_qs, urlparse
 from json import dumps, loads
 
 import app.datalayer
+from app.aws_publisher import AWSPublisher
 
 data_layer: app.datalayer.DataLayer
-
+aws_publisher = None
 
 class RequestHandler(http.server.BaseHTTPRequestHandler):
     # Form parameters saved server side
@@ -107,7 +108,7 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
             self.send_file_response('text/css')
             return
 
-        # API
+        # API DATA
         if self.path.startswith("/python-webserver/api/data"):
 
             parsedUrl = parse_qs(urlparse(self.path).query)
@@ -193,7 +194,137 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
             self.wfile.write(json.dumps(response).encode("utf-8"))
             return
 
-        
+        # API AWS 
+        if self.path.startswith("/python-webserver/api/aws_status"):
+
+            print("[API] /aws_status called", flush=True)
+
+            try:
+                parsedUrl = parse_qs(urlparse(self.path).query)
+                token = parsedUrl.get("token", [""])[0]
+
+                # Check permission
+                scopes_list = [
+                    "rexroth-device.all.rwx",
+                    "rexroth-python-webserver.web.r",
+                    "rexroth-python-webserver.web.rw"
+                ]
+                permissions_json = web.web_token.check_permissions(token, scopes_list)
+
+                if permissions_json is None:
+                    print("[AWS] Token invalid!", flush=True)
+                    self.send_response_and_header(401, "application/json")
+                    self.wfile.write(b'{"error": "invalid token"}')
+                    return
+
+                # Determine AWS status
+                status = "connected" if AWSPublisher.is_connected else "disconnected"
+
+                print(f"[AWS] Status fetched → {status}", flush=True)
+
+                response = {"status": status}
+
+                import json
+                self.send_response_and_header(200, "application/json")
+                self.wfile.write(json.dumps(response).encode("utf-8"))
+
+            except Exception as e:
+                print(f"[AWS] aws_status ERROR → {e}", flush=True)
+                self.send_response_and_header(500, "application/json")
+                self.wfile.write(b'{"status": "error"}')
+
+            return
+
+        if self.path.startswith("/python-webserver/api/aws_info"):
+
+            print("[API] /aws_info called", flush=True)
+
+            try:
+                parsedUrl = parse_qs(urlparse(self.path).query)
+                token = parsedUrl.get("token", [""])[0]
+
+                # Check permission
+                scopes_list = [
+                    "rexroth-device.all.rwx",
+                    "rexroth-python-webserver.web.r",
+                    "rexroth-python-webserver.web.rw"
+                ]
+                permissions_json = web.web_token.check_permissions(token, scopes_list)
+
+                if permissions_json is None:
+                    print("[AWS] Token invalid!", flush=True)
+                    self.send_response_and_header(401, "application/json")
+                    self.wfile.write(b'{"error": "invalid token"}')
+                    return
+
+                # AWS info mock (có thể cập nhật từ AWSPublisher nếu cần)
+                info = {
+                    "instance_name": "AWS IoT Core",
+                    "instance_type": "MQTT Broker",
+                    "instance_id": "a14u78rq4h2cd",
+                    "service_status": "active" if AWSPublisher.is_connected else "inactive",
+                    "licenses": ["AWS IoT", "MQTT", "TLS"],
+                    "security_groups": ["ctrlx-mqtt-secure"]
+                }
+
+                print(f"[AWS] Info sent → {info}", flush=True)
+
+                from json import dumps
+                self.send_response_and_header(200, "application/json")
+                self.wfile.write(dumps(info).encode("utf-8"))
+
+            except Exception as e:
+                print(f"[AWS] aws_info ERROR → {e}", flush=True)
+                self.send_response_and_header(500, "application/json")
+                self.wfile.write(b'{"error": "Failed to get AWS info"}')
+
+            return
+
+        if self.path.startswith("/python-webserver/api/aws_info"):
+
+            print("[API] /aws_info called", flush=True)
+
+            try:
+                parsedUrl = parse_qs(urlparse(self.path).query)
+                token = parsedUrl.get("token", [""])[0]
+
+                # Check permission
+                scopes_list = [
+                    "rexroth-device.all.rwx",
+                    "rexroth-python-webserver.web.r",
+                    "rexroth-python-webserver.web.rw"
+                ]
+                permissions_json = web.web_token.check_permissions(token, scopes_list)
+
+                if permissions_json is None:
+                    print("[AWS] Token invalid!", flush=True)
+                    self.send_response_and_header(401, "application/json")
+                    self.wfile.write(b'{"error": "invalid token"}')
+                    return
+
+                # AWS info mock (có thể cập nhật từ AWSPublisher nếu cần)
+                info = {
+                    "instance_name": "AWS IoT Core",
+                    "instance_type": "MQTT Broker",
+                    "instance_id": "a14u78rq4h2cd",
+                    "service_status": "active" if AWSPublisher.is_connected else "inactive",
+                    "licenses": ["AWS IoT", "MQTT", "TLS"],
+                    "security_groups": ["ctrlx-mqtt-secure"]
+                }
+
+                print(f"[AWS] Info sent → {info}", flush=True)
+
+                from json import dumps
+                self.send_response_and_header(200, "application/json")
+                self.wfile.write(dumps(info).encode("utf-8"))
+
+            except Exception as e:
+                print(f"[AWS] aws_info ERROR → {e}", flush=True)
+                self.send_response_and_header(500, "application/json")
+                self.wfile.write(b'{"error": "Failed to get AWS info"}')
+
+            return
+
         # HTML
         if self.path.startswith("/python-webserver"):
 

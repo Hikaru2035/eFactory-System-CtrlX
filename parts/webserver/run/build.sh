@@ -7,7 +7,7 @@ export SNAPCRAFT_EXTENSIONS_DIR="/snap/snapcraft/7201/share/snapcraft/extensions
 export SNAPCRAFT_PARALLEL_BUILD_COUNT="4"
 export SNAPCRAFT_PRIME="/home/boschrexroth/ctrlx-automation-sdk/samples-python/webserver/prime"
 export SNAPCRAFT_PROJECT_NAME="sdk-py-webserver"
-export SNAPCRAFT_PROJECT_VERSION="1.1.11"
+export SNAPCRAFT_PROJECT_VERSION="1.2.13"
 export SNAPCRAFT_PROJECT_DIR="/home/boschrexroth/ctrlx-automation-sdk/samples-python/webserver"
 export SNAPCRAFT_PROJECT_GRADE="stable"
 export SNAPCRAFT_STAGE="/home/boschrexroth/ctrlx-automation-sdk/samples-python/webserver/stage"
@@ -30,7 +30,7 @@ export SNAPCRAFT_PYTHON_VENV_ARGS=""
 set -xeuo pipefail
 "${SNAPCRAFT_PYTHON_INTERPRETER}" -m venv ${SNAPCRAFT_PYTHON_VENV_ARGS} "${SNAPCRAFT_PART_INSTALL}"
 SNAPCRAFT_PYTHON_VENV_INTERP_PATH="${SNAPCRAFT_PART_INSTALL}/bin/${SNAPCRAFT_PYTHON_INTERPRETER}"
-pip install  -U websockets
+pip install  -U websockets paho-mqtt boto3 requests
 [ -f setup.py ] && pip install  -U .
 find "${SNAPCRAFT_PART_INSTALL}" -type f -executable -print0 | xargs -0                 sed -i "1 s|^#\!${SNAPCRAFT_PYTHON_VENV_INTERP_PATH}.*$|#\!/usr/bin/env ${SNAPCRAFT_PYTHON_INTERPRETER}|"
 

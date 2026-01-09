@@ -14,6 +14,7 @@ import web.request_handler
 import web.unix_socket_server
 
 import app.datalayer
+from app.aws_publisher import AWSPublisher
 
 
 httpServerPort = 12345
@@ -31,7 +32,6 @@ def handler(signum, frame):
 
 
 def run():
-    """run"""
 
     client, connection_string = web.request_handler.data_layer.connect_client(
         ip="10.0.2.2", https_port=8443
@@ -69,7 +69,6 @@ def thread_start():
     # If running as app in an app builder envorinemtn start a TCP server
     run_webserver_unixsock() if "SNAP" in os.environ else run_webserver_tcp()
 
-
 def run_webserver_tcp():
     """run_webserver_tcp"""
     with http.server.HTTPServer(
@@ -95,7 +94,6 @@ def run_webserver_tcp():
 
         http_server.server_close()
 
-
 def run_webserver_unixsock():
     """run_webserver_unixsock"""
     sock_dir = os.getenv("SNAP_DATA") + "/package-run/sdk-py-webserver/"
@@ -118,7 +116,6 @@ def run_webserver_unixsock():
 
         http_server.server_close()
         os.remove(sock_file)
-
 
 if __name__ == "__main__":
     main()

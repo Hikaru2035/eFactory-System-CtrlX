@@ -1,7 +1,7 @@
 name: sdk-py-webserver
 title: eFactory Dashboard
-version: 1.1.11
-summary: Web server written in Python for ctrlX
+version: 1.2.13
+summary: Dashboard deveoped for ctrlX Factory Management
 description: |
   This sample shows how to create a web server app in ctrlX
 base: core22
@@ -12,6 +12,7 @@ apps:
   webserver:
     command: bin/main.py
     plugs:
+      - network
       - network-bind
       - active-solution
       - datalayer
@@ -26,6 +27,9 @@ parts:
     source: .
     python-packages:
       - websockets
+      - paho-mqtt
+      - boto3
+      - requests
     stage-packages:
       - libzmq5
       # - ctrlx-datalayer
