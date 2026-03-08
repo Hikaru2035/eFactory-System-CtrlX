@@ -5,17 +5,23 @@ files: !!set
   www/SL1_Sensor.png: null
   www/SL1_ctrlx_core_trans.png: null
   www/SL_3_ctrlx_drive.png: null
-  www/admin.html: null
   www/background001.png: null
-  www/cloud.html: null
+  www/ctrlx_background.png: null
+  www/ctrlx_background_home.mp4: null
+  www/ctrlx_background_scada.mp4: null
+  www/ctrlx_background_scada.png: null
   www/favicon.png: null
   www/index.html: null
   www/invalid-token.html: null
   www/logo.png: null
-  www/mes.html: null
-  www/scada.html: null
   www/script.js: null
+  www/style_mes.css: null
+  www/style_scada.css: null
   www/stylesheet.css: null
+  www/ui_admin.html: null
+  www/ui_cloud.html: null
+  www/ui_mes.html: null
+  www/ui_scada.html: null
 project_options: {}
 properties:
   filesets: {}

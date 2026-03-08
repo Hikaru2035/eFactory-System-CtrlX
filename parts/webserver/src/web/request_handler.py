@@ -102,7 +102,12 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
         if self.path.endswith(".gif"):
             self.send_file_response('image/gif')
             return
-
+        
+        # Image mp4
+        if self.path.endswith(".mp4"):
+            self.send_file_response('video/mp4')
+            return
+        
         # CSS
         if self.path.endswith(".css"):
             self.send_file_response('text/css')
@@ -116,7 +121,6 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
             if 'token' in parsedUrl:
                 token = parsedUrl['token'][0]
 
-            # check quyền
             scopes_list = ["rexroth-device.all.rwx",
                         "rexroth-python-webserver.web.r", 
                         "rexroth-python-webserver.web.rw"]
@@ -131,198 +135,302 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                 if isinstance(enum_dict, dict) and len(enum_dict) > 0:
                     return list(enum_dict.values())[0]
                 return str(enum_dict)
+            
+            # ------------------------- AVG FAC A+B -------------------------
+            result, avg_availability_val    = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeeAvailAverage")
+            result, avg_performance_val     = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeePerfAverage")
+            result, avg_quality_val         = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeeQualAverage")
+            result, avg_oee_val             = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeeCombinedAverage")
+            result, avg_temp_val            = data_layer.read_node("plc/app/Application/sym/PLC_PRG/tempAverage")
+            result, avg_humidity_val        = data_layer.read_node("plc/app/Application/sym/PLC_PRG/humidityAverage")
 
-            # Đọc dữ liệu từ DataLayer
+            result, avg_schedule1_val        = data_layer.read_node("plc/app/Application/sym/PLC_PRG/Schedule1")
+            result, avg_schedule2_val        = data_layer.read_node("plc/app/Application/sym/PLC_PRG/Schedule2")
+            result, avg_schedule3_val        = data_layer.read_node("plc/app/Application/sym/PLC_PRG/Schedule3")
+            result, avg_schedule4_val        = data_layer.read_node("plc/app/Application/sym/PLC_PRG/Schedule4")
+            result, avg_schedule5_val        = data_layer.read_node("plc/app/Application/sym/PLC_PRG/Schedule5")
+            result, avg_schedule6_val        = data_layer.read_node("plc/app/Application/sym/PLC_PRG/Schedule6")
+            result, avg_schedule7_val        = data_layer.read_node("plc/app/Application/sym/PLC_PRG/Schedule7")
+
+            result, avg_pos_x_val            = data_layer.read_node("plc/app/Application/sym/PLC_PRG/Pos_X")
+            result, avg_pos_y_val            = data_layer.read_node("plc/app/Application/sym/PLC_PRG/Pos_Y")
+            result, avg_pos_z_val            = data_layer.read_node("plc/app/Application/sym/PLC_PRG/Pos_Z")
+            
+            result, avg_cloud_connection_val  = data_layer.read_node("plc/app/Application/sym/PLC_PRG/cloudConnection")
+            result, avg_cloud_enable_val      = data_layer.read_node("plc/app/Application/sym/PLC_PRG/cloudEnable")
+            result, avg_data_enable_val       = data_layer.read_node("plc/app/Application/sym/PLC_PRG/dataEnable")
+
+            result, avg_cloud_connected     = data_layer.read_node("plc/app/Application/sym/PLC_PRG/cloudConnected")
+            result, avg_cloud_connecting    = data_layer.read_node("plc/app/Application/sym/PLC_PRG/cloudConnecting")
+            result, avg_cloud_error         = data_layer.read_node("plc/app/Application/sym/PLC_PRG/cloudError")
+            
+            result, avg_cloud_broker_val    = data_layer.read_node("plc/app/Application/sym/PLC_PRG/cloudBroker")
+            result, avg_cloud_ip_address    = data_layer.read_node("plc/app/Application/sym/PLC_PRG/cloudIpAddress")
+            result, avg_cloud_protocol      = data_layer.read_node("plc/app/Application/sym/PLC_PRG/cloudProtocol")
+            result, avg_cloud_region        = data_layer.read_node("plc/app/Application/sym/PLC_PRG/cloudRegion")
+            result, avg_last_sync_timestamp   = data_layer.read_node("plc/app/Application/sym/PLC_PRG/lastSyncTimestamp")
+
+            result, avg_time_counter_val     = data_layer.read_node("plc/app/Application/sym/PLC_PRG/timeCounter")
+            result, avg_time_cycle_val       = data_layer.read_node("plc/app/Application/sym/PLC_PRG/timeCycle")
+            result, avg_user_level_val       = data_layer.read_node("plc/app/Application/sym/PLC_PRG/userLevel")
+            result, avg_user_name_val        = data_layer.read_node("plc/app/Application/sym/PLC_PRG/userName")
+
             # ------------------------- FACTORY A -------------------------
-            result, availabilityA_val = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeeAvail1")
-            result, performanceA_val  = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeePerf1")
-            result, qualityA_val      = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeeQual1")
-            result, totalA_val        = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeeTotal1")
-            result, tempinsideA_val   = data_layer.read_node("plc/app/Application/sym/PLC_PRG/tempInside1")
-            result, tempoutsideA_val  = data_layer.read_node("plc/app/Application/sym/PLC_PRG/tempOutside1")
-            result, humidityinA_val   = data_layer.read_node("plc/app/Application/sym/PLC_PRG/humidityInside1")
-            result, humidityoutA_val  = data_layer.read_node("plc/app/Application/sym/PLC_PRG/humidityOutside1")
-            result, servo1_val        = data_layer.read_node("plc/app/Application/sym/PLC_PRG/servoPos1")
-            result, servo2_val        = data_layer.read_node("plc/app/Application/sym/PLC_PRG/servoPos2")
-            result, status1_val       = data_layer.read_node("plc/app/Application/sym/PLC_PRG/servoStatus1")
-            result, status2_val       = data_layer.read_node("plc/app/Application/sym/PLC_PRG/servoStatus2")
+            result, facA_availability_val   = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeeAvail1")
+            result, facA_performance_val    = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeePerf1")
+            result, facA_quality_val        = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeeQual1")
+            result, facA_oee_val            = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeeTotal1")
+            
+            result, facA_temp_outside_val   = data_layer.read_node("plc/app/Application/sym/PLC_PRG/tempOutside1")
+            result, facA_temp_inside_val    = data_layer.read_node("plc/app/Application/sym/PLC_PRG/tempInside1")
+            result, facA_temp_avg_val       = data_layer.read_node("plc/app/Application/sym/PLC_PRG/tempAverage1")
+            result, facA_humid_inside_val   = data_layer.read_node("plc/app/Application/sym/PLC_PRG/humidityInside1")
+            result, facA_humid_outside_val  = data_layer.read_node("plc/app/Application/sym/PLC_PRG/humidityOutside1")
+            result, facA_humid_avg_val      = data_layer.read_node("plc/app/Application/sym/PLC_PRG/humidityAverage1")
 
-            # ------------------------- FACTORY B -------------------------
-            result, availabilityB_val = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeeAvail2")
-            result, performanceB_val  = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeePerf2")
-            result, qualityB_val      = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeeQual2")
-            result, totalB_val        = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeeTotal2")
-            result, tempinsideB_val   = data_layer.read_node("plc/app/Application/sym/PLC_PRG/tempInside2")
-            result, tempoutsideB_val  = data_layer.read_node("plc/app/Application/sym/PLC_PRG/tempOutside2")
-            result, humidityinB_val   = data_layer.read_node("plc/app/Application/sym/PLC_PRG/humidityInside2")
-            result, humidityoutB_val  = data_layer.read_node("plc/app/Application/sym/PLC_PRG/humidityOutside2")
-            result, servo3_val        = data_layer.read_node("plc/app/Application/sym/PLC_PRG/servoPos3")
-            result, servo4_val        = data_layer.read_node("plc/app/Application/sym/PLC_PRG/servoPos4")
-            result, status3_val       = data_layer.read_node("plc/app/Application/sym/PLC_PRG/servoStatus3")
-            result, status4_val       = data_layer.read_node("plc/app/Application/sym/PLC_PRG/servoStatus4")
+            result, facA_servo1_temp_val    = data_layer.read_node("plc/app/Application/sym/PLC_PRG/servoTemp1")
+            result, facA_servo1_pos_val     = data_layer.read_node("plc/app/Application/sym/PLC_PRG/servoPos1")
+            result, facA_servo1_status_val  = data_layer.read_node("plc/app/Application/sym/PLC_PRG/servoStatus1")
+            result, facA_servo2_temp_val    = data_layer.read_node("plc/app/Application/sym/PLC_PRG/servoTemp2")
+            result, facA_servo2_pos_val     = data_layer.read_node("plc/app/Application/sym/PLC_PRG/servoPos2")
+            result, facA_servo2_status_val  = data_layer.read_node("plc/app/Application/sym/PLC_PRG/servoStatus2")
+            
+            result, facA_sensor1_status_val = data_layer.read_node("plc/app/Application/sym/PLC_PRG/sensorStatus1")
+            result, facA_sensor2_status_val = data_layer.read_node("plc/app/Application/sym/PLC_PRG/sensorStatus2")
+            result, facA_sensor1_disInPos_val = data_layer.read_node("plc/app/Application/sym/PLC_PRG/sensorDistInPos1")
+            result, facA_sensor2_disInPos_val = data_layer.read_node("plc/app/Application/sym/PLC_PRG/sensorDistInPos2")
+            result, facA_driver_status_val  = data_layer.read_node("plc/app/Application/sym/PLC_PRG/driverStatus1")
+
+            result, facA_sensor1_temp_val = data_layer.read_node("plc/app/Application/sym/PLC_PRG/sensorTemp1")
+            result, facA_sensor2_temp_val = data_layer.read_node("plc/app/Application/sym/PLC_PRG/sensorTemp2")
+            result, facA_controller1_status_val  = data_layer.read_node("plc/app/Application/sym/PLC_PRG/controllerStatus1")
+            result, facA_controller1_temp_val  = data_layer.read_node("plc/app/Application/sym/PLC_PRG/controllerTemp1")
+            result, facA_controller1_usage_val  = data_layer.read_node("plc/app/Application/sym/PLC_PRG/controllerUsage1")
+            result, facA_driver_current1_val  = data_layer.read_node("plc/app/Application/sym/PLC_PRG/driverCurrent1")
+            result, facA_driver_temp1_val  = data_layer.read_node("plc/app/Application/sym/PLC_PRG/driverTemp1")
+
+             # ------------------------- FACTORY B -------------------------
+            result, facB_availability_val   = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeeAvail2")
+            result, facB_performance_val    = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeePerf2")
+            result, facB_quality_val        = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeeQual2")
+            result, facB_oee_val            = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeeTotal2")
+            
+            result, facB_temp_outside_val   = data_layer.read_node("plc/app/Application/sym/PLC_PRG/tempInside2")
+            result, facB_temp_inside_val    = data_layer.read_node("plc/app/Application/sym/PLC_PRG/tempOutside2")
+            result, facB_temp_avg_val       = data_layer.read_node("plc/app/Application/sym/PLC_PRG/tempAverage2")
+            result, facB_humid_inside_val   = data_layer.read_node("plc/app/Application/sym/PLC_PRG/humidityInside2")
+            result, facB_humid_outside_val  = data_layer.read_node("plc/app/Application/sym/PLC_PRG/humidityOutside2")
+            result, facB_humid_avg_val      = data_layer.read_node("plc/app/Application/sym/PLC_PRG/humidityAverage2")
+
+            result, facB_servo1_temp_val    = data_layer.read_node("plc/app/Application/sym/PLC_PRG/servoTemp3")
+            result, facB_servo1_pos_val     = data_layer.read_node("plc/app/Application/sym/PLC_PRG/servoPos3")
+            result, facB_servo1_status_val  = data_layer.read_node("plc/app/Application/sym/PLC_PRG/servoStatus3")
+            result, facB_servo2_temp_val    = data_layer.read_node("plc/app/Application/sym/PLC_PRG/servoTemp4")
+            result, facB_servo2_pos_val     = data_layer.read_node("plc/app/Application/sym/PLC_PRG/servoPos4")
+            result, facB_servo2_status_val  = data_layer.read_node("plc/app/Application/sym/PLC_PRG/servoStatus4")
+            
+            result, facB_sensor1_status_val = data_layer.read_node("plc/app/Application/sym/PLC_PRG/sensorStatus3")
+            result, facB_sensor2_status_val = data_layer.read_node("plc/app/Application/sym/PLC_PRG/sensorStatus4")
+            result, facB_sensor1_disInPos_val = data_layer.read_node("plc/app/Application/sym/PLC_PRG/sensorDistInPos3")
+            result, facB_sensor2_disInPos_val = data_layer.read_node("plc/app/Application/sym/PLC_PRG/sensorDistInPos4")
+            result, facB_driver_status_val  = data_layer.read_node("plc/app/Application/sym/PLC_PRG/driverStatus2")
+
+            result, facB_sensor3_temp_val = data_layer.read_node("plc/app/Application/sym/PLC_PRG/sensorTemp3")
+            result, facB_sensor4_temp_val = data_layer.read_node("plc/app/Application/sym/PLC_PRG/sensorTemp4")
+            result, facB_controller2_status_val  = data_layer.read_node("plc/app/Application/sym/PLC_PRG/controllerStatus2")
+            result, facB_controller2_temp_val  = data_layer.read_node("plc/app/Application/sym/PLC_PRG/controllerTemp2")
+            result, facB_controller2_usage_val  = data_layer.read_node("plc/app/Application/sym/PLC_PRG/controllerUsage2")
+            result, facB_driver_current2_val  = data_layer.read_node("plc/app/Application/sym/PLC_PRG/driverCurrent2")
+            result, facB_driver_temp2_val  = data_layer.read_node("plc/app/Application/sym/PLC_PRG/driverTemp2")
 
             # ------------------------- JSON RESPONSE -------------------------
             response = {
-                # Factory A
-                "availabilityA": round(availabilityA_val),
-                "performanceA": round(performanceA_val),
-                "qualityA": round(qualityA_val),
-                "oeeA": round(totalA_val),
-                "temperatureA": round((tempinsideA_val + tempoutsideA_val)/2),
-                "humidityA": round((humidityinA_val + humidityoutA_val)/2),
-                "servoPosA": round(servo1_val,2),
-                "sensorPosA": round(servo2_val,2),
-                "driverStatus1": extract_enum_value(status1_val),
-                "driverStatus2": extract_enum_value(status2_val),
+                # ================= AVG (Factory A + B) =================
+                "avg": {
+                    "availability"  : round(avg_availability_val),
+                    "performance"   : round(avg_performance_val),
+                    "quality"       : round(avg_quality_val),
+                    "oee"           : round(avg_oee_val),
+                    "temperature"   : round(avg_temp_val, 1),
+                    "humidity"      : round(avg_humidity_val, 1),
 
-                # Factory B
-                "availabilityB": round(availabilityB_val),
-                "performanceB": round(performanceB_val),
-                "qualityB": round(qualityB_val),
-                "oeeB": round(totalB_val),
-                "temperatureB": round((tempinsideB_val + tempoutsideB_val)/2),
-                "humidityB": round((humidityinB_val + humidityoutB_val)/2),
-                "servoPosB": round(servo3_val,2),
-                "sensorPosB": round(servo4_val,2),
-                "driverStatus3": extract_enum_value(status3_val),
-                "driverStatus4": extract_enum_value(status4_val)
+                    "schedule1"     : round(avg_schedule1_val, 1),
+                    "schedule2"     : round(avg_schedule2_val, 1),
+                    "schedule3"     : round(avg_schedule3_val, 1),
+                    "schedule4"     : round(avg_schedule4_val, 1),
+                    "schedule5"     : round(avg_schedule5_val, 1),
+                    "schedule6"     : round(avg_schedule6_val, 1),
+                    "schedule7"     : round(avg_schedule7_val, 1),
+
+                    "position": {
+                        "x": round(avg_pos_x_val, 2),
+                        "y": round(avg_pos_y_val, 2),
+                        "z": round(avg_pos_z_val, 2)
+                    },
+                    
+                    "cloud": {
+                        "connection": bool(avg_cloud_connection_val),
+                        "enable": bool(avg_cloud_enable_val),
+                        "dataEnable": bool(avg_data_enable_val),
+
+                        "status": {
+                            "connected": bool(avg_cloud_connected),
+                            "connecting": bool(avg_cloud_connecting),
+                            "error": bool(avg_cloud_error)
+                        },
+
+                        "info": {
+                            "broker": avg_cloud_broker_val,
+                            "region": avg_cloud_region,
+                            "protocol": avg_cloud_protocol,
+                            "ipAddress": avg_cloud_ip_address,
+                            "lastSync": avg_last_sync_timestamp
+                        }
+                    },
+
+                    "system": {
+                        "timeCounter": avg_time_counter_val,
+                        "timeCycle": avg_time_cycle_val
+                    },
+
+                    "user": {
+                        "level": avg_user_level_val,
+                        "name": avg_user_name_val
+                    }
+                },
+
+                # ================= FACTORY A =================
+                "factoryA": {
+                    "oee": {
+                        "availability"  : round(facA_availability_val),
+                        "performance"   : round(facA_performance_val),
+                        "quality"       : round(facA_quality_val),
+                        "total"         : round(facA_oee_val)
+                    },
+                    "environment": {
+                        "temperature": {
+                            "inside": round(facA_temp_inside_val, 1),
+                            "outside": round(facA_temp_outside_val, 1),
+                            "average": round(facA_temp_avg_val, 1)
+                        },
+                        "humidity": {
+                            "inside": round(facA_humid_inside_val, 1),
+                            "outside": round(facA_humid_outside_val, 1),
+                            "average": round(facA_humid_avg_val, 1)
+                        }
+                    },
+                    "machines": {
+                        "servo1": {
+                            "temperature": round(facA_servo1_temp_val, 1),
+                            "position": round(facA_servo1_pos_val, 1),
+                            "status": extract_enum_value(facA_servo1_status_val)
+                        },
+                        "servo2": {
+                            "temperature": round(facA_servo2_temp_val, 1),
+                            "position": round(facA_servo2_pos_val, 1),
+                            "status": extract_enum_value(facA_servo2_status_val)
+                        }
+                    },
+                    "status": {
+                        "sensor1": extract_enum_value(facA_sensor1_status_val),
+                        "sensor2": extract_enum_value(facA_sensor2_status_val),
+                        "driver": extract_enum_value(facA_driver_status_val)
+                    },
+                    "distance": {
+                        "sensor1": facA_sensor1_disInPos_val,
+                        "sensor2": facA_sensor2_disInPos_val
+                    },
+                   
+                    "devices": {
+                        "sensors": {
+                            "sensor1": {
+                                "temperature": round(facA_sensor1_temp_val, 1)
+                            },
+                            "sensor2": {
+                                "temperature": round(facA_sensor2_temp_val, 1)
+                            }
+                        },
+                        "controller": {
+                            "status": extract_enum_value(facA_controller1_status_val),
+                            "temperature": round(facA_controller1_temp_val, 1),
+                            "usage": round(facA_controller1_usage_val, 1)
+                        },
+                        "driver": {
+                            "current": round(facA_driver_current1_val, 1),
+                            "temperature": round(facA_driver_temp1_val, 1)
+                        }
+                    }
+
+                },
+
+                # ================= FACTORY B =================
+                "factoryB": {
+                    "oee": {
+                        "availability": round(facB_availability_val),
+                        "performance": round(facB_performance_val),
+                        "quality": round(facB_quality_val),
+                        "total": round(facB_oee_val)
+                    },
+                    "environment": {
+                        "temperature": {
+                            "inside": round(facB_temp_inside_val, 1),
+                            "outside": round(facB_temp_outside_val, 1),
+                            "average": round(facB_temp_avg_val, 1)
+                        },
+                        "humidity": {
+                            "inside": round(facB_humid_inside_val, 1),
+                            "outside": round(facB_humid_outside_val, 1),
+                            "average": round(facB_humid_avg_val, 1)
+                        }
+                    },
+                    "machines": {
+                        "servo1": {
+                            "temperature": round(facB_servo1_temp_val, 1),
+                            "position": round(facB_servo1_pos_val, 1),
+                            "status": extract_enum_value(facB_servo1_status_val)
+                        },
+                        "servo2": {
+                            "temperature": round(facB_servo2_temp_val, 1),
+                            "position": round(facB_servo2_pos_val, 1),
+                            "status": extract_enum_value(facB_servo2_status_val)
+                        }
+                    },
+                    "status": {
+                        "sensor1": extract_enum_value(facB_sensor1_status_val),
+                        "sensor2": extract_enum_value(facB_sensor2_status_val),
+                        "driver": extract_enum_value(facB_driver_status_val)
+                    },
+                    "distance": {
+                        "sensor1": facB_sensor1_disInPos_val,
+                        "sensor2": facB_sensor2_disInPos_val
+                    },
+
+                    "devices": {
+                        "sensors": {
+                            "sensor1": {
+                                "temperature": round(facB_sensor3_temp_val, 1)
+                            },
+                            "sensor2": {
+                                "temperature": round(facB_sensor4_temp_val, 1)
+                            }
+                        },
+                        "controller": {
+                            "status": extract_enum_value(facB_controller2_status_val),
+                            "temperature": round(facB_controller2_temp_val, 1),
+                            "usage": round(facB_controller2_usage_val, 1)
+                        },
+                        "driver": {
+                            "current": round(facB_driver_current2_val, 1),
+                            "temperature": round(facB_driver_temp2_val, 1)
+                        }
+                    }
+
+                }
             }
 
-            # Gửi về client
             import json
             self.send_response_and_header(200, 'application/json')
             self.wfile.write(json.dumps(response).encode("utf-8"))
-            return
-
-        # API AWS 
-        if self.path.startswith("/python-webserver/api/aws_status"):
-
-            print("[API] /aws_status called", flush=True)
-
-            try:
-                parsedUrl = parse_qs(urlparse(self.path).query)
-                token = parsedUrl.get("token", [""])[0]
-
-                # Check permission
-                scopes_list = [
-                    "rexroth-device.all.rwx",
-                    "rexroth-python-webserver.web.r",
-                    "rexroth-python-webserver.web.rw"
-                ]
-                permissions_json = web.web_token.check_permissions(token, scopes_list)
-
-                if permissions_json is None:
-                    print("[AWS] Token invalid!", flush=True)
-                    self.send_response_and_header(401, "application/json")
-                    self.wfile.write(b'{"error": "invalid token"}')
-                    return
-
-                # Determine AWS status
-                status = "connected" if AWSPublisher.is_connected else "disconnected"
-
-                print(f"[AWS] Status fetched → {status}", flush=True)
-
-                response = {"status": status}
-
-                import json
-                self.send_response_and_header(200, "application/json")
-                self.wfile.write(json.dumps(response).encode("utf-8"))
-
-            except Exception as e:
-                print(f"[AWS] aws_status ERROR → {e}", flush=True)
-                self.send_response_and_header(500, "application/json")
-                self.wfile.write(b'{"status": "error"}')
-
-            return
-
-        if self.path.startswith("/python-webserver/api/aws_info"):
-
-            print("[API] /aws_info called", flush=True)
-
-            try:
-                parsedUrl = parse_qs(urlparse(self.path).query)
-                token = parsedUrl.get("token", [""])[0]
-
-                # Check permission
-                scopes_list = [
-                    "rexroth-device.all.rwx",
-                    "rexroth-python-webserver.web.r",
-                    "rexroth-python-webserver.web.rw"
-                ]
-                permissions_json = web.web_token.check_permissions(token, scopes_list)
-
-                if permissions_json is None:
-                    print("[AWS] Token invalid!", flush=True)
-                    self.send_response_and_header(401, "application/json")
-                    self.wfile.write(b'{"error": "invalid token"}')
-                    return
-
-                # AWS info mock (có thể cập nhật từ AWSPublisher nếu cần)
-                info = {
-                    "instance_name": "AWS IoT Core",
-                    "instance_type": "MQTT Broker",
-                    "instance_id": "a14u78rq4h2cd",
-                    "service_status": "active" if AWSPublisher.is_connected else "inactive",
-                    "licenses": ["AWS IoT", "MQTT", "TLS"],
-                    "security_groups": ["ctrlx-mqtt-secure"]
-                }
-
-                print(f"[AWS] Info sent → {info}", flush=True)
-
-                from json import dumps
-                self.send_response_and_header(200, "application/json")
-                self.wfile.write(dumps(info).encode("utf-8"))
-
-            except Exception as e:
-                print(f"[AWS] aws_info ERROR → {e}", flush=True)
-                self.send_response_and_header(500, "application/json")
-                self.wfile.write(b'{"error": "Failed to get AWS info"}')
-
-            return
-
-        if self.path.startswith("/python-webserver/api/aws_info"):
-
-            print("[API] /aws_info called", flush=True)
-
-            try:
-                parsedUrl = parse_qs(urlparse(self.path).query)
-                token = parsedUrl.get("token", [""])[0]
-
-                # Check permission
-                scopes_list = [
-                    "rexroth-device.all.rwx",
-                    "rexroth-python-webserver.web.r",
-                    "rexroth-python-webserver.web.rw"
-                ]
-                permissions_json = web.web_token.check_permissions(token, scopes_list)
-
-                if permissions_json is None:
-                    print("[AWS] Token invalid!", flush=True)
-                    self.send_response_and_header(401, "application/json")
-                    self.wfile.write(b'{"error": "invalid token"}')
-                    return
-
-                # AWS info mock (có thể cập nhật từ AWSPublisher nếu cần)
-                info = {
-                    "instance_name": "AWS IoT Core",
-                    "instance_type": "MQTT Broker",
-                    "instance_id": "a14u78rq4h2cd",
-                    "service_status": "active" if AWSPublisher.is_connected else "inactive",
-                    "licenses": ["AWS IoT", "MQTT", "TLS"],
-                    "security_groups": ["ctrlx-mqtt-secure"]
-                }
-
-                print(f"[AWS] Info sent → {info}", flush=True)
-
-                from json import dumps
-                self.send_response_and_header(200, "application/json")
-                self.wfile.write(dumps(info).encode("utf-8"))
-
-            except Exception as e:
-                print(f"[AWS] aws_info ERROR → {e}", flush=True)
-                self.send_response_and_header(500, "application/json")
-                self.wfile.write(b'{"error": "Failed to get AWS info"}')
-
             return
 
         # HTML
@@ -403,14 +511,6 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                 permissions_json['rexroth-python-webserver.web.rw']))
             htmlX = htmlX.replace('$(permissions_r)', str(
                 permissions_json['rexroth-python-webserver.web.r']))
-            
-            schedule_data = "[12, 19, 3, 5, 2, 3, 10, 15, 7, 8, 12, 14]"
-            error_rows = """
-                <tr><td>12:23:34</td><td>Line 1</td><td>Error</td></tr>
-                <tr><td>09:45:23</td><td>Line 2</td><td>Warn</td></tr>
-            """
-            htmlX = htmlX.replace("$(schedule_data)", schedule_data)
-            htmlX = htmlX.replace("$(error_rows)", error_rows)
 
             self.wfile.write(htmlX.encode("utf-8"))
             return

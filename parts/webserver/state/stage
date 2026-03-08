@@ -6,14 +6,13 @@ directories: !!set
   lib: null
   lib/python3.10: null
   lib/python3.10/site-packages: null
-  lib/python3.10/site-packages/PyJWT-2.10.1.dist-info: null
   lib/python3.10/site-packages/__pycache__: null
   lib/python3.10/site-packages/_distutils_hack: null
   lib/python3.10/site-packages/_distutils_hack/__pycache__: null
   lib/python3.10/site-packages/app: null
   lib/python3.10/site-packages/app/__pycache__: null
   lib/python3.10/site-packages/boto3: null
-  lib/python3.10/site-packages/boto3-1.42.24.dist-info: null
+  lib/python3.10/site-packages/boto3-1.42.49.dist-info: null
   lib/python3.10/site-packages/boto3/__pycache__: null
   lib/python3.10/site-packages/boto3/data: null
   lib/python3.10/site-packages/boto3/data/cloudformation: null
@@ -52,7 +51,7 @@ directories: !!set
   lib/python3.10/site-packages/boto3/s3: null
   lib/python3.10/site-packages/boto3/s3/__pycache__: null
   lib/python3.10/site-packages/botocore: null
-  lib/python3.10/site-packages/botocore-1.42.24.dist-info: null
+  lib/python3.10/site-packages/botocore-1.42.49.dist-info: null
   lib/python3.10/site-packages/botocore/__pycache__: null
   lib/python3.10/site-packages/botocore/crt: null
   lib/python3.10/site-packages/botocore/crt/__pycache__: null
@@ -1073,7 +1072,7 @@ directories: !!set
   lib/python3.10/site-packages/idna-3.11.dist-info/licenses: null
   lib/python3.10/site-packages/idna/__pycache__: null
   lib/python3.10/site-packages/jmespath: null
-  lib/python3.10/site-packages/jmespath-1.0.1.dist-info: null
+  lib/python3.10/site-packages/jmespath-1.1.0.dist-info: null
   lib/python3.10/site-packages/jmespath/__pycache__: null
   lib/python3.10/site-packages/jwt: null
   lib/python3.10/site-packages/jwt/__pycache__: null
@@ -1256,6 +1255,8 @@ directories: !!set
   lib/python3.10/site-packages/pkg_resources/tests/data: null
   lib/python3.10/site-packages/pkg_resources/tests/data/my-test-package-source: null
   lib/python3.10/site-packages/pkg_resources/tests/data/my-test-package-source/__pycache__: null
+  lib/python3.10/site-packages/pyjwt-2.11.0.dist-info: null
+  lib/python3.10/site-packages/pyjwt-2.11.0.dist-info/licenses: null
   lib/python3.10/site-packages/python_dateutil-2.9.0.post0.dist-info: null
   lib/python3.10/site-packages/requests: null
   lib/python3.10/site-packages/requests-2.32.5.dist-info: null
@@ -1314,7 +1315,8 @@ directories: !!set
   lib/python3.10/site-packages/web/automation: null
   lib/python3.10/site-packages/web/automation/__pycache__: null
   lib/python3.10/site-packages/websockets: null
-  lib/python3.10/site-packages/websockets-15.0.1.dist-info: null
+  lib/python3.10/site-packages/websockets-16.0.dist-info: null
+  lib/python3.10/site-packages/websockets-16.0.dist-info/licenses: null
   lib/python3.10/site-packages/websockets/__pycache__: null
   lib/python3.10/site-packages/websockets/asyncio: null
   lib/python3.10/site-packages/websockets/asyncio/__pycache__: null
@@ -1355,13 +1357,6 @@ files: !!set
   bin/python3: null
   bin/python3.10: null
   bin/websockets: null
-  lib/python3.10/site-packages/PyJWT-2.10.1.dist-info/AUTHORS.rst: null
-  lib/python3.10/site-packages/PyJWT-2.10.1.dist-info/INSTALLER: null
-  lib/python3.10/site-packages/PyJWT-2.10.1.dist-info/LICENSE: null
-  lib/python3.10/site-packages/PyJWT-2.10.1.dist-info/METADATA: null
-  lib/python3.10/site-packages/PyJWT-2.10.1.dist-info/RECORD: null
-  lib/python3.10/site-packages/PyJWT-2.10.1.dist-info/WHEEL: null
-  lib/python3.10/site-packages/PyJWT-2.10.1.dist-info/top_level.txt: null
   lib/python3.10/site-packages/__pycache__/six.cpython-310.pyc: null
   lib/python3.10/site-packages/_distutils_hack/__init__.py: null
   lib/python3.10/site-packages/_distutils_hack/__pycache__/__init__.cpython-310.pyc: null
@@ -1373,14 +1368,14 @@ files: !!set
   lib/python3.10/site-packages/app/aws_publisher.py: null
   lib/python3.10/site-packages/app/ctrlx_datalayer_helper.py: null
   lib/python3.10/site-packages/app/datalayer.py: null
-  lib/python3.10/site-packages/boto3-1.42.24.dist-info/INSTALLER: null
-  lib/python3.10/site-packages/boto3-1.42.24.dist-info/LICENSE: null
-  lib/python3.10/site-packages/boto3-1.42.24.dist-info/METADATA: null
-  lib/python3.10/site-packages/boto3-1.42.24.dist-info/NOTICE: null
-  lib/python3.10/site-packages/boto3-1.42.24.dist-info/RECORD: null
-  lib/python3.10/site-packages/boto3-1.42.24.dist-info/REQUESTED: null
-  lib/python3.10/site-packages/boto3-1.42.24.dist-info/WHEEL: null
-  lib/python3.10/site-packages/boto3-1.42.24.dist-info/top_level.txt: null
+  lib/python3.10/site-packages/boto3-1.42.49.dist-info/INSTALLER: null
+  lib/python3.10/site-packages/boto3-1.42.49.dist-info/LICENSE: null
+  lib/python3.10/site-packages/boto3-1.42.49.dist-info/METADATA: null
+  lib/python3.10/site-packages/boto3-1.42.49.dist-info/NOTICE: null
+  lib/python3.10/site-packages/boto3-1.42.49.dist-info/RECORD: null
+  lib/python3.10/site-packages/boto3-1.42.49.dist-info/REQUESTED: null
+  lib/python3.10/site-packages/boto3-1.42.49.dist-info/WHEEL: null
+  lib/python3.10/site-packages/boto3-1.42.49.dist-info/top_level.txt: null
   lib/python3.10/site-packages/boto3/__init__.py: null
   lib/python3.10/site-packages/boto3/__pycache__/__init__.cpython-310.pyc: null
   lib/python3.10/site-packages/boto3/__pycache__/compat.cpython-310.pyc: null
@@ -1476,13 +1471,13 @@ files: !!set
   lib/python3.10/site-packages/boto3/s3/transfer.py: null
   lib/python3.10/site-packages/boto3/session.py: null
   lib/python3.10/site-packages/boto3/utils.py: null
-  lib/python3.10/site-packages/botocore-1.42.24.dist-info/INSTALLER: null
-  lib/python3.10/site-packages/botocore-1.42.24.dist-info/LICENSE.txt: null
-  lib/python3.10/site-packages/botocore-1.42.24.dist-info/METADATA: null
-  lib/python3.10/site-packages/botocore-1.42.24.dist-info/NOTICE: null
-  lib/python3.10/site-packages/botocore-1.42.24.dist-info/RECORD: null
-  lib/python3.10/site-packages/botocore-1.42.24.dist-info/WHEEL: null
-  lib/python3.10/site-packages/botocore-1.42.24.dist-info/top_level.txt: null
+  lib/python3.10/site-packages/botocore-1.42.49.dist-info/INSTALLER: null
+  lib/python3.10/site-packages/botocore-1.42.49.dist-info/LICENSE.txt: null
+  lib/python3.10/site-packages/botocore-1.42.49.dist-info/METADATA: null
+  lib/python3.10/site-packages/botocore-1.42.49.dist-info/NOTICE: null
+  lib/python3.10/site-packages/botocore-1.42.49.dist-info/RECORD: null
+  lib/python3.10/site-packages/botocore-1.42.49.dist-info/WHEEL: null
+  lib/python3.10/site-packages/botocore-1.42.49.dist-info/top_level.txt: null
   lib/python3.10/site-packages/botocore/__init__.py: null
   lib/python3.10/site-packages/botocore/__pycache__/__init__.cpython-310.pyc: null
   lib/python3.10/site-packages/botocore/__pycache__/args.cpython-310.pyc: null
@@ -2043,6 +2038,7 @@ files: !!set
   lib/python3.10/site-packages/botocore/data/connectcampaignsv2/2024-04-23/service-2.json.gz: null
   lib/python3.10/site-packages/botocore/data/connectcases/2022-10-03/endpoint-rule-set-1.json.gz: null
   lib/python3.10/site-packages/botocore/data/connectcases/2022-10-03/paginators-1.json: null
+  lib/python3.10/site-packages/botocore/data/connectcases/2022-10-03/paginators-1.sdk-extras.json: null
   lib/python3.10/site-packages/botocore/data/connectcases/2022-10-03/service-2.json.gz: null
   lib/python3.10/site-packages/botocore/data/connectcases/2022-10-03/waiters-2.json: null
   lib/python3.10/site-packages/botocore/data/connectparticipant/2018-09-07/endpoint-rule-set-1.json.gz: null
@@ -2091,6 +2087,7 @@ files: !!set
   lib/python3.10/site-packages/botocore/data/datazone/2018-05-10/paginators-1.json: null
   lib/python3.10/site-packages/botocore/data/datazone/2018-05-10/paginators-1.sdk-extras.json: null
   lib/python3.10/site-packages/botocore/data/datazone/2018-05-10/service-2.json.gz: null
+  lib/python3.10/site-packages/botocore/data/datazone/2018-05-10/waiters-2.json: null
   lib/python3.10/site-packages/botocore/data/dax/2017-04-19/endpoint-rule-set-1.json.gz: null
   lib/python3.10/site-packages/botocore/data/dax/2017-04-19/examples-1.json: null
   lib/python3.10/site-packages/botocore/data/dax/2017-04-19/paginators-1.json: null
@@ -2348,6 +2345,7 @@ files: !!set
   lib/python3.10/site-packages/botocore/data/geo-maps/2020-11-19/endpoint-rule-set-1.json.gz: null
   lib/python3.10/site-packages/botocore/data/geo-maps/2020-11-19/paginators-1.json: null
   lib/python3.10/site-packages/botocore/data/geo-maps/2020-11-19/service-2.json.gz: null
+  lib/python3.10/site-packages/botocore/data/geo-maps/2020-11-19/waiters-2.json: null
   lib/python3.10/site-packages/botocore/data/geo-places/2020-11-19/endpoint-rule-set-1.json.gz: null
   lib/python3.10/site-packages/botocore/data/geo-places/2020-11-19/paginators-1.json: null
   lib/python3.10/site-packages/botocore/data/geo-places/2020-11-19/service-2.json.gz: null
@@ -2584,6 +2582,7 @@ files: !!set
   lib/python3.10/site-packages/botocore/data/launch-wizard/2018-05-10/endpoint-rule-set-1.json.gz: null
   lib/python3.10/site-packages/botocore/data/launch-wizard/2018-05-10/paginators-1.json: null
   lib/python3.10/site-packages/botocore/data/launch-wizard/2018-05-10/service-2.json.gz: null
+  lib/python3.10/site-packages/botocore/data/launch-wizard/2018-05-10/waiters-2.json: null
   lib/python3.10/site-packages/botocore/data/lex-models/2017-04-19/endpoint-rule-set-1.json.gz: null
   lib/python3.10/site-packages/botocore/data/lex-models/2017-04-19/examples-1.json: null
   lib/python3.10/site-packages/botocore/data/lex-models/2017-04-19/paginators-1.json: null
@@ -3303,6 +3302,7 @@ files: !!set
   lib/python3.10/site-packages/botocore/data/transcribe/2017-10-26/examples-1.json: null
   lib/python3.10/site-packages/botocore/data/transcribe/2017-10-26/paginators-1.json: null
   lib/python3.10/site-packages/botocore/data/transcribe/2017-10-26/service-2.json.gz: null
+  lib/python3.10/site-packages/botocore/data/transcribe/2017-10-26/waiters-2.json: null
   lib/python3.10/site-packages/botocore/data/transfer/2018-11-05/endpoint-rule-set-1.json.gz: null
   lib/python3.10/site-packages/botocore/data/transfer/2018-11-05/examples-1.json: null
   lib/python3.10/site-packages/botocore/data/transfer/2018-11-05/paginators-1.json: null
@@ -5112,12 +5112,12 @@ files: !!set
   lib/python3.10/site-packages/idna/package_data.py: null
   lib/python3.10/site-packages/idna/py.typed: null
   lib/python3.10/site-packages/idna/uts46data.py: null
-  lib/python3.10/site-packages/jmespath-1.0.1.dist-info/INSTALLER: null
-  lib/python3.10/site-packages/jmespath-1.0.1.dist-info/LICENSE.txt: null
-  lib/python3.10/site-packages/jmespath-1.0.1.dist-info/METADATA: null
-  lib/python3.10/site-packages/jmespath-1.0.1.dist-info/RECORD: null
-  lib/python3.10/site-packages/jmespath-1.0.1.dist-info/WHEEL: null
-  lib/python3.10/site-packages/jmespath-1.0.1.dist-info/top_level.txt: null
+  lib/python3.10/site-packages/jmespath-1.1.0.dist-info/INSTALLER: null
+  lib/python3.10/site-packages/jmespath-1.1.0.dist-info/LICENSE: null
+  lib/python3.10/site-packages/jmespath-1.1.0.dist-info/METADATA: null
+  lib/python3.10/site-packages/jmespath-1.1.0.dist-info/RECORD: null
+  lib/python3.10/site-packages/jmespath-1.1.0.dist-info/WHEEL: null
+  lib/python3.10/site-packages/jmespath-1.1.0.dist-info/top_level.txt: null
   lib/python3.10/site-packages/jmespath/__init__.py: null
   lib/python3.10/site-packages/jmespath/__pycache__/__init__.cpython-310.pyc: null
   lib/python3.10/site-packages/jmespath/__pycache__/ast.cpython-310.pyc: null
@@ -6999,6 +6999,13 @@ files: !!set
   lib/python3.10/site-packages/pkg_resources/extern/__pycache__/__init__.cpython-310.pyc: null
   lib/python3.10/site-packages/pkg_resources/tests/data/my-test-package-source/__pycache__/setup.cpython-310.pyc: null
   lib/python3.10/site-packages/pkg_resources/tests/data/my-test-package-source/setup.py: null
+  lib/python3.10/site-packages/pyjwt-2.11.0.dist-info/INSTALLER: null
+  lib/python3.10/site-packages/pyjwt-2.11.0.dist-info/METADATA: null
+  lib/python3.10/site-packages/pyjwt-2.11.0.dist-info/RECORD: null
+  lib/python3.10/site-packages/pyjwt-2.11.0.dist-info/WHEEL: null
+  lib/python3.10/site-packages/pyjwt-2.11.0.dist-info/licenses/AUTHORS.rst: null
+  lib/python3.10/site-packages/pyjwt-2.11.0.dist-info/licenses/LICENSE: null
+  lib/python3.10/site-packages/pyjwt-2.11.0.dist-info/top_level.txt: null
   lib/python3.10/site-packages/python_dateutil-2.9.0.post0.dist-info/INSTALLER: null
   lib/python3.10/site-packages/python_dateutil-2.9.0.post0.dist-info/LICENSE: null
   lib/python3.10/site-packages/python_dateutil-2.9.0.post0.dist-info/METADATA: null
@@ -7721,14 +7728,14 @@ files: !!set
   lib/python3.10/site-packages/web/request_handler.py: null
   lib/python3.10/site-packages/web/unix_socket_server.py: null
   lib/python3.10/site-packages/web/web_token.py: null
-  lib/python3.10/site-packages/websockets-15.0.1.dist-info/INSTALLER: null
-  lib/python3.10/site-packages/websockets-15.0.1.dist-info/LICENSE: null
-  lib/python3.10/site-packages/websockets-15.0.1.dist-info/METADATA: null
-  lib/python3.10/site-packages/websockets-15.0.1.dist-info/RECORD: null
-  lib/python3.10/site-packages/websockets-15.0.1.dist-info/REQUESTED: null
-  lib/python3.10/site-packages/websockets-15.0.1.dist-info/WHEEL: null
-  lib/python3.10/site-packages/websockets-15.0.1.dist-info/entry_points.txt: null
-  lib/python3.10/site-packages/websockets-15.0.1.dist-info/top_level.txt: null
+  lib/python3.10/site-packages/websockets-16.0.dist-info/INSTALLER: null
+  lib/python3.10/site-packages/websockets-16.0.dist-info/METADATA: null
+  lib/python3.10/site-packages/websockets-16.0.dist-info/RECORD: null
+  lib/python3.10/site-packages/websockets-16.0.dist-info/REQUESTED: null
+  lib/python3.10/site-packages/websockets-16.0.dist-info/WHEEL: null
+  lib/python3.10/site-packages/websockets-16.0.dist-info/entry_points.txt: null
+  lib/python3.10/site-packages/websockets-16.0.dist-info/licenses/LICENSE: null
+  lib/python3.10/site-packages/websockets-16.0.dist-info/top_level.txt: null
   lib/python3.10/site-packages/websockets/__init__.py: null
   lib/python3.10/site-packages/websockets/__main__.py: null
   lib/python3.10/site-packages/websockets/__pycache__/__init__.cpython-310.pyc: null
@@ -7745,6 +7752,7 @@ files: !!set
   lib/python3.10/site-packages/websockets/__pycache__/http11.cpython-310.pyc: null
   lib/python3.10/site-packages/websockets/__pycache__/imports.cpython-310.pyc: null
   lib/python3.10/site-packages/websockets/__pycache__/protocol.cpython-310.pyc: null
+  lib/python3.10/site-packages/websockets/__pycache__/proxy.cpython-310.pyc: null
   lib/python3.10/site-packages/websockets/__pycache__/server.cpython-310.pyc: null
   lib/python3.10/site-packages/websockets/__pycache__/streams.cpython-310.pyc: null
   lib/python3.10/site-packages/websockets/__pycache__/typing.cpython-310.pyc: null
@@ -7803,6 +7811,7 @@ files: !!set
   lib/python3.10/site-packages/websockets/legacy/protocol.py: null
   lib/python3.10/site-packages/websockets/legacy/server.py: null
   lib/python3.10/site-packages/websockets/protocol.py: null
+  lib/python3.10/site-packages/websockets/proxy.py: null
   lib/python3.10/site-packages/websockets/py.typed: null
   lib/python3.10/site-packages/websockets/server.py: null
   lib/python3.10/site-packages/websockets/speedups.c: null

@@ -39,3 +39,4 @@ data/
 Thumbs.db
 
 aws-iot-device-sdk-python-v2/
+*.snap
