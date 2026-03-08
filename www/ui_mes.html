@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eFactory System</title>
+    <link rel="icon" type="image/jpg" sizes="16x16" href="/python-webserver/favicon.png">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <link rel="stylesheet" href="/python-webserver/stylesheet.css">
+    <link rel="stylesheet" href="/python-webserver/style_mes.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <div class="topbar">
+        <div class="topbar-left">
+            <img class="logo" src="/python-webserver/logo.png" alt="Logo">
+            <h2>eFactory System</h2>
+        </div>
+        <div class="nav">
+            <a href="/python-webserver?token=$(token)" class="chip">Home</a>
+            <a href="/python-webserver/ui_scada.html?token=$(token)" class="chip">SCADA</a>
+            <a href="/python-webserver/ui_mes.html?token=$(token)" class="chip">MES</a>
+            <a href="/python-webserver/ui_cloud.html?token=$(token)" class="chip">Cloud</a>
+            <a href="/python-webserver/ui_admin.html?token=$(token)" class="chip">Admin</a>
+        </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="container">
+        <!-- Left Card (DataLayer Table) -->
+        <div class="card">
+            <div class="table-wrapper">
+                <table class="main-table">
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Enabled</th>
+                            <th>Address</th>
+                            <th>Value</th>
+                            <th>Note</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Right Cards (Cloud Connection + Baud Rate + Graphs)  -->
+        <div class="side-panel">
+            <div class="card cloud-card">
+                <h3>
+                    <span id="cloudStatusDot" class="status-dot dot-yellow"></span>
+                    <span id="cloudStatusText">CLOUD CONNECTING</span>
+                </h3>
+
+                <div class="cloud-info">
+                    <p><strong>Protocol:</strong> <span id="cloudProtocol">--</span></p>
+                    <p><strong>IP Address:</strong> <span id="cloudIp">--</span></p>
+                    <p><strong>Broker:</strong> <span id="cloudBroker">--</span></p>
+                    <p><strong>Last Sync:</strong> <span id="lastSync">--</span></p>
+                </div>
+
+                <button id="btnConnect" class="btn-connect">Connect Data</button>
+            </div>
+            <div class="card">
+                <h3>BAUD RATE</h3>
+                <div class="chart-placeholder"></div>
+            </div>
+            <div class="card">
+                <h3>RUNNING SCHEDULE</h3>
+                <canvas id="scheduleChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <script>
+        const token = "$(token)";
+
+        //===== SCHEDULE CHART =====
+        scheduleChart = new Chart(document.getElementById('scheduleChart'), {
+            type: 'bar',
+            data: {
+                labels: ['01/01', '02/01', '03/01', '04/01', '05/01', '06/01', '07/01'],
+                datasets: [{
+                    data: [0, 0, 0, 0, 0, 0, 0],
+                    backgroundColor: '#001B48'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'end',
+                        color: '#001B48',
+                        font: { weight: 'bold' }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            color: '#001B48',
+                            font: { size: 12 }
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: '#001B48'
+                        }
+                    }
+                }
+            },
+            plugins: [ChartDataLabels]
+        });
+        const scheduleLabels = [
+            '01/01', '02/01', '03/01',
+            '04/01', '05/01', '06/01', '07/01'
+        ];
+        function extractSchedules(avg) {
+            const values = [];
+            for (let i = 1; i <= 7; i++) {
+                values.push(avg[`schedule${i}`]);
+            }
+            return values;
+        }
+
+        //===== CLOUD STATUS =====
+        function setCloudStatus(status) {
+            const dot = document.getElementById("cloudStatusDot");
+            const text = document.getElementById("cloudStatusText");
+
+            dot.classList.remove("dot-green", "dot-red", "dot-yellow");
+
+            if (status === "connected") {
+                dot.classList.add("dot-green");
+                text.textContent = "CLOUD CONNECTED";
+            }
+            else if (status === "connecting") {
+                dot.classList.add("dot-yellow");
+                text.textContent = "CLOUD CONNECTING";
+            }
+            else {
+                dot.classList.add("dot-red");
+                text.textContent = "CLOUD DISCONNECTED";
+            }
+        }
+
+        // DETAILED PARAMETER TABLE
+        const tableBody = document.querySelector(".main-table tbody");
+        const dataMapping = [
+            // ================= AVG (Factory A + B) =================
+            { name: "Availability AVG", key: "avg.availability", note: "Factory A+B" },
+            { name: "Performance AVG", key: "avg.performance", note: "Factory A+B" },
+            { name: "Quality AVG", key: "avg.quality", note: "Factory A+B" },
+            { name: "OEE AVG", key: "avg.oee", note: "Factory A+B" },
+
+            { name: "Temperature AVG", key: "avg.temperature", note: "Factory A+B" },
+            { name: "Humidity AVG", key: "avg.humidity", note: "Factory A+B" },
+
+            { name: "Schedule 1", key: "avg.schedule1", note: "Schedule" },
+            { name: "Schedule 2", key: "avg.schedule2", note: "Schedule" },
+            { name: "Schedule 3", key: "avg.schedule3", note: "Schedule" },
+            { name: "Schedule 4", key: "avg.schedule4", note: "Schedule" },
+            { name: "Schedule 5", key: "avg.schedule5", note: "Schedule" },
+            { name: "Schedule 6", key: "avg.schedule6", note: "Schedule" },
+            { name: "Schedule 7", key: "avg.schedule7", note: "Schedule" },
+
+            { name: "Pos X", key: "avg.position.x", note: "Robot Position" },
+            { name: "Pos Y", key: "avg.position.y", note: "Robot Position" },
+            { name: "Pos Z", key: "avg.position.z", note: "Robot Position" },
+
+            { name: "Cloud Connection", key: "avg.cloud.connection", note: "System" },
+            { name: "Time Counter", key: "avg.system.timeCounter", note: "System" },
+            { name: "Time Cycle", key: "avg.system.timeCycle", note: "System" },
+
+            { name: "User Level", key: "avg.user.level", note: "System" },
+            { name: "User Name", key: "avg.user.name", note: "System" },
+
+            // ================= FACTORY A =================
+            { name: "Availability", key: "factoryA.oee.availability", note: "Factory A" },
+            { name: "Performance", key: "factoryA.oee.performance", note: "Factory A" },
+            { name: "Quality", key: "factoryA.oee.quality", note: "Factory A" },
+            { name: "OEE Total", key: "factoryA.oee.total", note: "Factory A" },
+
+            { name: "Temp Inside", key: "factoryA.environment.temperature.inside", note: "Factory A" },
+            { name: "Temp Outside", key: "factoryA.environment.temperature.outside", note: "Factory A" },
+            { name: "Temp AVG", key: "factoryA.environment.temperature.average", note: "Factory A" },
+
+            { name: "Humidity Inside", key: "factoryA.environment.humidity.inside", note: "Factory A" },
+            { name: "Humidity Outside", key: "factoryA.environment.humidity.outside", note: "Factory A" },
+            { name: "Humidity AVG", key: "factoryA.environment.humidity.average", note: "Factory A" },
+
+            { name: "Servo1 Temp", key: "factoryA.machines.servo1.temperature", note: "Factory A" },
+            { name: "Servo1 Pos", key: "factoryA.machines.servo1.position", note: "Factory A" },
+            { name: "Servo1 Status", key: "factoryA.machines.servo1.status", note: "Factory A" },
+
+            { name: "Servo2 Temp", key: "factoryA.machines.servo2.temperature", note: "Factory A" },
+            { name: "Servo2 Pos", key: "factoryA.machines.servo2.position", note: "Factory A" },
+            { name: "Servo2 Status", key: "factoryA.machines.servo2.status", note: "Factory A" },
+
+            { name: "Sensor1 Status", key: "factoryA.status.sensor1", note: "Factory A" },
+            { name: "Sensor2 Status", key: "factoryA.status.sensor2", note: "Factory A" },
+            { name: "Driver Status", key: "factoryA.status.driver", note: "Factory A" },
+
+            { name: "Sensor1 Distance", key: "factoryA.distance.sensor1", note: "Factory A" },
+            { name: "Sensor2 Distance", key: "factoryA.distance.sensor2", note: "Factory A" },
+
+            { name: "Controller Status", key: "factoryA.devices.controller.status", note: "Factory A" },
+            { name: "Controller Temp", key: "factoryA.devices.controller.temperature", note: "Factory A" },
+            { name: "Controller Usage", key: "factoryA.devices.controller.usage", note: "Factory A" },
+
+            { name: "Driver Current", key: "factoryA.devices.driver.current", note: "Factory A" },
+            { name: "Driver Temp", key: "factoryA.devices.driver.temperature", note: "Factory A" },
+
+            // ================= FACTORY B =================
+            { name: "Availability", key: "factoryB.oee.availability", note: "Factory B" },
+            { name: "Performance", key: "factoryB.oee.performance", note: "Factory B" },
+            { name: "Quality", key: "factoryB.oee.quality", note: "Factory B" },
+            { name: "OEE Total", key: "factoryB.oee.total", note: "Factory B" },
+
+            { name: "Temp Inside", key: "factoryB.environment.temperature.inside", note: "Factory B" },
+            { name: "Temp Outside", key: "factoryB.environment.temperature.outside", note: "Factory B" },
+            { name: "Temp AVG", key: "factoryB.environment.temperature.average", note: "Factory B" },
+
+            { name: "Humidity Inside", key: "factoryB.environment.humidity.inside", note: "Factory B" },
+            { name: "Humidity Outside", key: "factoryB.environment.humidity.outside", note: "Factory B" },
+            { name: "Humidity AVG", key: "factoryB.environment.humidity.average", note: "Factory B" },
+
+            { name: "Servo3 Temp", key: "factoryB.machines.servo1.temperature", note: "Factory B" },
+            { name: "Servo3 Pos", key: "factoryB.machines.servo1.position", note: "Factory B" },
+            { name: "Servo3 Status", key: "factoryB.machines.servo1.status", note: "Factory B" },
+
+            { name: "Servo4 Temp", key: "factoryB.machines.servo2.temperature", note: "Factory B" },
+            { name: "Servo4 Pos", key: "factoryB.machines.servo2.position", note: "Factory B" },
+            { name: "Servo4 Status", key: "factoryB.machines.servo2.status", note: "Factory B" },
+
+            { name: "Sensor1 Status", key: "factoryB.status.sensor1", note: "Factory B" },
+            { name: "Sensor2 Status", key: "factoryB.status.sensor2", note: "Factory B" },
+            { name: "Driver Status", key: "factoryB.status.driver", note: "Factory B" },
+
+            { name: "Controller Status", key: "factoryB.devices.controller.status", note: "Factory B" },
+            { name: "Controller Temp", key: "factoryB.devices.controller.temperature", note: "Factory B" },
+            { name: "Controller Usage", key: "factoryB.devices.controller.usage", note: "Factory B" },
+
+            { name: "Driver Current", key: "factoryB.devices.driver.current", note: "Factory B" },
+            { name: "Driver Temp", key: "factoryB.devices.driver.temperature", note: "Factory B" },
+        ];
+        function getValueByPath(obj, path) {
+            return path.split('.').reduce((o, key) => {
+                return (o && o[key] !== undefined) ? o[key] : undefined;
+            }, obj);
+        }
+        function renderTable(data) {
+            if (!data) return;
+
+            tableBody.innerHTML = "";
+
+            dataMapping.forEach(item => {
+
+                const tr = document.createElement("tr");
+
+                const tdName = document.createElement("td");
+                tdName.textContent = item.name;
+
+                const tdCheck = document.createElement("td");
+                const checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.checked = true;
+                tdCheck.appendChild(checkbox);
+
+                const tdAddr = document.createElement("td");
+                tdAddr.textContent = item.key;
+
+                const tdValue = document.createElement("td");
+                const value = getValueByPath(data, item.key);
+                tdValue.textContent =
+                    value !== undefined ? value : "--";
+
+                const tdNote = document.createElement("td");
+                tdNote.textContent = item.note;
+
+                tr.append(tdName, tdCheck, tdAddr, tdValue, tdNote);
+                tableBody.appendChild(tr);
+            });
+        }
+
+        // CLOUD STATUS
+        function updateCloudInfo(data) {
+            const cloud = data?.avg?.cloud;
+            if (!cloud) {
+                setCloudStatus("disconnected");
+                return;
+            }
+
+            const status = cloud.status || {};
+            const info = cloud.info || {};
+
+            if (status.error === true)
+                setCloudStatus("disconnected");
+            else if (status.connected === true)
+                setCloudStatus("connected");
+            else if (status.connecting === true)
+                setCloudStatus("connecting");
+            else
+                setCloudStatus("disconnected");
+
+            document.getElementById("cloudProtocol").textContent =
+                info.protocol || "--";
+
+            document.getElementById("cloudIp").textContent =
+                info.ipAddress || "--";
+
+            document.getElementById("cloudBroker").textContent =
+                info.broker || "--";
+
+            document.getElementById("lastSync").textContent =
+                info.lastSync || "--";
+        }
+
+        // Fetch AVG. Data
+        async function fetchData() {
+            try {
+                const res = await fetch(`/python-webserver/api/data?token=${token}`);
+                if (!res.ok) throw new Error("Network error");
+                return await res.json();
+            } catch (err) {
+                console.error("Fetch error:", err);
+                return null;
+            }
+        }
+        async function updateUI() {
+            const data = await fetchData();
+            if (!data) {
+                setCloudStatus("disconnected");
+                return;
+            }
+            renderTable(data);
+
+            if (data.avg) {
+                const schedulesValue = extractSchedules(data.avg);
+                scheduleChart.data.datasets[0].data = schedulesValue;
+                scheduleChart.update();
+            }
+            updateCloudInfo(data);
+        }
+
+        // Refresh loop
+        updateUI();
+        setInterval(updateUI, 1000); 
+
+    </script>
+</body>
+
+</html>

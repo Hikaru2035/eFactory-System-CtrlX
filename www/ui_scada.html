@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eFactory System</title>
+    <link rel="icon" type="image/jpg" sizes="16x16" href="/python-webserver/favicon.png">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+    <link rel="stylesheet" href="/python-webserver/stylesheet.css">
+    <link rel="stylesheet" href="/python-webserver/style_scada.css">
+</head>
+
+<body>
+
+    <video autoplay muted loop playsinline class="bg-video">
+        <source src="/python-webserver/ctrlx_background_scada.mp4" type="video/mp4">
+    </video>
+
+    <div class="topbar">
+        <div class="topbar-left">
+            <img class="logo" src="/python-webserver/logo.png" alt="Logo">
+            <h2>eFactory System</h2>
+        </div>
+        <div class="nav">
+            <a href="/python-webserver?token=$(token)" class="chip">Home</a>
+            <a href="/python-webserver/ui_scada.html?token=$(token)" class="chip">SCADA</a>
+            <a href="/python-webserver/ui_mes.html?token=$(token)" class="chip">MES</a>
+            <a href="/python-webserver/ui_cloud.html?token=$(token)" class="chip">Cloud</a>
+            <a href="/python-webserver/ui_admin.html?token=$(token)" class="chip">Admin</a>
+        </div>
+    </div>
+
+    <div class="scada-root">
+        <div class="factory-layout">
+
+            <!-- ========== LEFT COLUMN ========= -->
+            <div class="left-top-scada">
+
+                <!-- OEE CARD -->
+                <div class="card dark oee-info">
+                    <h3>Average Machine OEE</h3>
+
+                    <div class="oee-column">
+                        <div class="oee-content">
+                            <div class="oee-value" id="avg-oee">--</div>
+                            <ul class="oee-list">
+                                <li>
+                                    <span class="label">Availability</span>
+                                    <span class="value" id="avg-availability">--</span>
+                                </li>
+                                <li>
+                                    <span class="label">Performance</span>
+                                    <span class="value" id="avg-performance">--</span>
+                                </li>
+                                <li>
+                                    <span class="label">Quality</span>
+                                    <span class="value" id="avg-quality">--</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FACTORY NAV -->
+                <div class="card dark oee-nav-card">
+                    <ul class="oee-nav">
+                        <li id="prev-factory">Previous</li>
+                        <li id="factory-name">Factory A</li>
+                        <li id="next-factory">Next</li>
+                    </ul>
+                </div>
+
+                <div class="left-top-spacer"></div>
+
+            </div>
+
+            <!-- ========== CENTER COLUMN (EMPTY / RESERVED) ========= -->
+            <div class="center-top-scada">
+                <!-- Reserved for:
+                    - SVG / Canvas
+                    - 3D factory view
+                -->
+            </div>
+
+            <!-- ========== RIGHT COLUMN ========= -->
+            <div class="right-top-scada">
+
+                <!-- TEMPERATURE -->
+                <div class="card">
+                    <h3>Temperature Monitoring</h3>
+                    <div class="env-charts">
+                        <div class="gauge-container">
+                            <canvas id="tempGaugeIn"></canvas>
+                            <div class="gauge-label">In. Temperature</div>
+                        </div>
+                        <div class="gauge-container">
+                            <canvas id="tempGaugeAvg"></canvas>
+                            <div class="gauge-label">Avg. Temperature</div>
+                        </div>
+                        <div class="gauge-container">
+                            <canvas id="tempGaugeOut"></canvas>
+                            <div class="gauge-label">Out. Temperature</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HUMIDITY -->
+                <div class="card">
+                    <h3>Humidity Monitoring</h3>
+                    <div class="env-charts">
+                        <div class="gauge-container">
+                            <canvas id="humidityGaugeIn"></canvas>
+                            <div class="gauge-label">In. Humidity</div>
+                        </div>
+                        <div class="gauge-container">
+                            <canvas id="humidityGaugeAvg"></canvas>
+                            <div class="gauge-label">Avg. Humidity</div>
+                        </div>
+                        <div class="gauge-container">
+                            <canvas id="humidityGaugeOut"></canvas>
+                            <div class="gauge-label">Out. Humidity</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="right-bottom-scada">
+            <div class="scada-panel">
+                <div class="grid-header">
+                    <div>Device</div>
+                    <div>Status</div>
+                    <div>Parameter</div>
+                    <div style="text-align:right;padding-right:15px">Value</div>
+                    <div>Unit</div>
+                    <div>Temp (°C)</div>
+                    <div>Detailed Info</div>
+                </div>
+
+
+                <div class="grid-row">
+                    <div class="device-name">Sensor 1</div>
+                    <div id="sensor1-status" class="status">--</div>
+
+                    <div class="parameter">Object in Position</div>
+
+                    <div id="sensor1-value" class="digital-value">--</div>
+                    <div class="unit">--</div>
+
+                    <div class="temp-col">
+                        <div id="sensor1-temp" class="temp-val">--</div>
+                    </div>
+                    <div class="detail-col">
+                        <span class="detail-btn" onclick="openDetail('sensor1')">...</span>
+                    </div>
+                </div>
+
+
+                <div class="grid-row">
+                    <div class="device-name">Sensor 2</div>
+                    <div id="sensor2-status" class="status">--</div>
+
+                    <div class="parameter">Object in Position</div>
+
+                    <div id="sensor2-value" class="digital-value">--</div>
+                    <div class="unit">--</div>
+
+                    <div class="temp-col">
+                        <div id="sensor2-temp" class="temp-val">--</div>
+                    </div>
+                    <div class="detail-col">
+                        <span class="detail-btn" onclick="openDetail('sensor2')">...</span>
+                    </div>
+                </div>
+
+
+
+                <div class="grid-row">
+                    <div class="device-name">Servo X</div>
+                    <div id="servo1-status" class="status">--</div>
+                    <div class="parameter">Position</div>
+                    <div id="servo1-pos" class="digital-value">--</div>
+                    <div class="unit">mm</div>
+
+                    <div class="temp-col">
+                        <div id="servo1-temp" class="temp-val">--</div>
+                    </div>
+
+                    <div class="detail-col">
+                        <span class="detail-btn" onclick="openDetail('servo1')">...</span>
+                    </div>
+                </div>
+
+
+                <div class="grid-row">
+                    <div class="device-name">Servo Y</div>
+
+                    <div id="servo2-status" class="status">--</div>
+                    <div class="parameter">Position</div>
+                    <div id="servo2-pos" class="digital-value">--</div>
+                    <div class="unit">mm</div>
+                    <div class="temp-col">
+                        <div id="servo2-temp" class="temp-val">--</div>
+                    </div>
+                    <div class="detail-col">
+                        <span class="detail-btn" onclick="openDetail('servo2')">...</span>
+                    </div>
+                </div>
+
+
+                <div class="grid-row">
+                    <div class="device-name">Driver</div>
+
+                    <div id="driver-status" class="status">--</div>
+
+                    <div class="parameter">Current</div>
+                    <div id="driver-current" class="digital-value">--</div>
+                    <div class="unit">A</div>
+
+                    <div class="temp-col">
+                        <div id="driver-temp" class="temp-val">--</div>
+                    </div>
+
+                    <div class="detail-col">
+                        <span class="detail-btn" onclick="openDetail('driver')">...</span>
+                    </div>
+                </div>
+
+
+
+                <div class="grid-row" style="border-bottom:none;">
+                    <div class="device-name">Controller</div>
+
+                    <div id="controller-status" class="status">--</div>
+
+                    <div class="parameter">Usage</div>
+                    <div id="controller-usage" class="digital-value">--</div>
+                    <div class="unit">%</div>
+
+                    <div class="temp-col">
+                        <div id="controller-temp" class="temp-val">--</div>
+                    </div>
+
+                    <div class="detail-col">
+                        <span class="detail-btn" onclick="openDetail('controller')">...</span>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ================= STATE ================= */
+        const token = "$(token)";
+        const factories = ["factoryA", "factoryB"];
+        let currentFactory = "factoryA";
+        let factoryData = null;
+
+        /* ================= GAUGE ================= */
+        const gaugeText = {
+            id: 'gaugeText',
+            afterDraw(chart) {
+                const { ctx, chartArea: { width, height } } = chart;
+                const val = chart.data.datasets[0].data[0];
+                const unit = chart.options.plugins.gaugeUnit || "";
+                ctx.save();
+                ctx.font = 'bold 22px Arial';
+                ctx.fillStyle = '#001B48';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(val + unit, width / 2, height / 2);
+                ctx.restore();
+            }
+        };
+
+        function createGauge(el, color, unit) {
+            return new Chart(el, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [0, 100],
+                        backgroundColor: [color, '#001B48'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    cutout: '65%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false },
+                        gaugeUnit: unit
+                    }
+                },
+                plugins: [gaugeText]
+            });
+        }
+
+        /* ================= INIT GAUGES ================= */
+        // ===== TEMPERATURE =====
+        const tempInGauge = createGauge(
+            document.getElementById("tempGaugeIn"),
+            '#018ABE',
+            '℃'
+        );
+
+        const tempAvgGauge = createGauge(
+            document.getElementById("tempGaugeAvg"),
+            '#018ABE',
+            '℃'
+        );
+
+        const tempOutGauge = createGauge(
+            document.getElementById("tempGaugeOut"),
+            '#018ABE',
+            '℃'
+        );
+
+        // ===== HUMIDITY =====
+        const humInGauge = createGauge(
+            document.getElementById("humidityGaugeIn"),
+            '#2EC4B6',
+            '%'
+        );
+
+        const humAvgGauge = createGauge(
+            document.getElementById("humidityGaugeAvg"),
+            '#2EC4B6',
+            '%'
+        );
+
+        const humOutGauge = createGauge(
+            document.getElementById("humidityGaugeOut"),
+            '#2EC4B6',
+            '%'
+        );
+
+        /* ================= DEVICES PARAMETER ================= */
+        /* ================= FETCH ================= */
+        async function loadData() {
+            const res = await fetch(`/python-webserver/api/data?token=${token}`);
+            factoryData = await res.json();
+            renderFactory();
+        }
+
+        //JS — helper đổi trạng thái màu
+
+        function setStatus(el, status) {
+            if (!el) return;
+
+            /* ===== ctrlX enum object ===== */
+            if (typeof status === "object" && status !== null) {
+                const keys = Object.keys(status);
+                if (keys.length > 0) {
+                    status = status[keys[0]];
+                }
+            }
+
+            /* ===== JSON string case ===== */
+            if (typeof status === "string") {
+                const trimmed = status.trim();
+                if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
+                    try {
+                        const parsed = JSON.parse(trimmed);
+                        const keys = Object.keys(parsed);
+                        if (keys.length > 0) {
+                            status = parsed[keys[0]];
+                        }
+                    } catch { }
+                }
+            }
+
+            status = String(status || "").toUpperCase();
+
+            /* ===== reset class ===== */
+            el.classList.remove("st-ok", "st-warn", "st-fault");
+
+            /* ===== render ===== */
+            switch (status) {
+                case "WORKING":
+                case "OK":
+                    el.textContent = "OK";
+                    el.classList.add("st-ok");
+                    break;
+
+                case "STANDBY":
+                case "WARN":
+                case "WARNING":
+                    el.textContent = "WARN";
+                    el.classList.add("st-warn");
+                    break;
+
+                case "ERROR":
+                case "FAULT":
+                    el.textContent = "FAULT";
+                    el.classList.add("st-fault");
+                    break;
+
+                default:
+                    el.textContent = "--";
+            }
+        }
+        /* ================= RENDER ================= */
+        function renderFactory() {
+            if (!factoryData) return;
+
+            const f = factoryData[currentFactory];
+
+            if (!f) return;
+
+            document.getElementById("factory-name").textContent =
+                currentFactory === "factoryA" ? "Factory A" : "Factory B";
+
+            /* ===== OEE ===== */
+            document.getElementById("avg-availability").textContent = f.oee.availability + "%";
+            document.getElementById("avg-performance").textContent = f.oee.performance + "%";
+            document.getElementById("avg-quality").textContent = f.oee.quality + "%";
+            document.getElementById("avg-oee").textContent = f.oee.total + "%";
+
+            /* ===== TEMPERATURE ===== */
+            updateGauge(tempInGauge, f.environment.temperature.inside);
+            updateGauge(tempAvgGauge, f.environment.temperature.average);
+            updateGauge(tempOutGauge, f.environment.temperature.outside);
+
+            /* ===== HUMIDITY ===== */
+            updateGauge(humInGauge, f.environment.humidity.inside);
+            updateGauge(humAvgGauge, f.environment.humidity.average);
+            updateGauge(humOutGauge, f.environment.humidity.outside);
+
+            /* ===== SCADA DEVICES ===== */
+
+            // Sensor 1
+            setStatus(
+                document.getElementById("sensor1-status"),
+                f.status.sensor1
+            );
+            document.getElementById("sensor1-value").textContent =
+                f.distance.sensor1;
+
+            // Sensor 2
+            setStatus(
+                document.getElementById("sensor2-status"),
+                f.status.sensor2
+            );
+            document.getElementById("sensor2-value").textContent =
+                f.distance.sensor2;
+
+            // Servo 1
+            setStatus(
+                document.getElementById("servo1-status"),
+                f.machines.servo1.status
+            );
+
+            document.getElementById("servo1-pos").textContent =
+                f.machines.servo1.position.toFixed(1);
+
+            document.getElementById("servo1-temp").textContent =
+                f.machines.servo1.temperature.toFixed(1) + "°C";
+
+            // Servo 2
+            setStatus(
+                document.getElementById("servo2-status"),
+                f.machines.servo2.status
+            );
+
+            document.getElementById("servo2-pos").textContent =
+                f.machines.servo2.position.toFixed(1);
+
+            document.getElementById("servo2-temp").textContent =
+                f.machines.servo2.temperature.toFixed(1) + "°C";
+
+            // Driver
+            setStatus(
+                document.getElementById("driver-status"),
+                f.status.driver
+            );
+
+            /* ===== CONTROLLER ===== */
+            if (f.devices?.controller) {
+                setStatus(
+                    document.getElementById("controller-status"),
+                    f.devices.controller.status
+                );
+
+                document.getElementById("controller-temp").textContent =
+                    f.devices.controller.temperature.toFixed(1) + "°C";
+
+                document.getElementById("controller-usage").textContent =
+                    f.devices.controller.usage.toFixed(1) + "%";
+            }
+
+            /* ===== DRIVER EXTRA ===== */
+            if (f.devices?.driver) {
+                document.getElementById("driver-current").textContent =
+                    f.devices.driver.current.toFixed(1);
+
+                document.getElementById("driver-temp").textContent =
+                    f.devices.driver.temperature.toFixed(1) + "°C";
+            }
+
+            /* ===== SENSOR TEMPERATURE ===== */
+            if (f.devices?.sensors?.sensor1)
+                document.getElementById("sensor1-temp").textContent =
+                    f.devices.sensors.sensor1.temperature.toFixed(1) + "°C";
+
+            if (f.devices?.sensors?.sensor2)
+                document.getElementById("sensor2-temp").textContent =
+                    f.devices.sensors.sensor2.temperature.toFixed(1) + "°C";
+        }
+
+        /* ================= HELPERS ================= */
+        function updateGauge(chart, value) {
+            chart.data.datasets[0].data = [value, 100 - value];
+            chart.update();
+        }
+
+        /* ================= SWITCH FACTORY ================= */
+        function switchFactory() {
+            currentFactory = currentFactory === "factoryA" ? "factoryB" : "factoryA";
+            renderFactory();
+        }
+
+        document.getElementById("prev-factory").onclick = switchFactory;
+        document.getElementById("next-factory").onclick = switchFactory;
+
+        // Refresh loop
+        loadData();
+        setInterval(() => {
+            loadData();   // <-- fetch lại data mới
+        }, 500);
+
+        function openDetail(device) {
+            const machines = {
+                sensor1: {
+                    img: "SL1_Sensor.png",
+                    info: "Sensor 1\nTemperature sensor\nFactory A"
+                },
+                sensor2: {
+                    img: "SL1_Sensor.png",
+                    info: "Sensor 2\nTemperature sensor\nFactory A"
+                },
+                servo1: {
+                    img: "SL1_ctrlx_core_trans.png",
+                    info: "Servo X\nAxis motor"
+                },
+                servo2: {
+                    img: "SL1_ctrlx_core_trans.png",
+                    info: "Servo Y\nAxis motor"
+                },
+                driver: {
+                    img: "SL_3_ctrlx_drive.png",
+                    info: "Motor driver\nMax speed: 3000 rpm"
+                },
+                controller: {
+                    img: "SL1_ctrlx_core_trans.png",
+                    info: "Main controller PLC"
+                }
+            };
+            document.getElementById("detailImage").src =
+                machines[device].img;
+
+            document.getElementById("detailContent").innerText =
+                machines[device].info;
+
+            document.getElementById("detailModal").style.display = "flex";
+        }
+        function closeDetail() {
+            document.getElementById("detailModal").style.display = "none";
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,103 @@
+/* layout */
+.container {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    padding: 0 1vw;
+    height: 90vh;
+    gap: 2vh;
+}
+
+/* bảng trung tâm */
+.table-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: auto;
+    height: 100%;
+}
+
+.main-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.main-table th,
+.main-table td {
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    text-align: center;
+    font-size: 14px;
+}
+
+.main-table th {
+    background: #001B48;
+}
+
+/* panel phải */
+.side-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.cloud-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    height: 100%;
+    /* cho chiều cao khớp card */
+    padding-bottom: 6vh;
+    /* chừa khoảng trống cho nút */
+}
+
+.cloud-info {
+    font-size: 1.6vh;
+    margin: 1vh 0;
+    line-height: 1.4;
+}
+
+.btn-connect {
+    position: absolute;
+    bottom: 1.5vh;
+    right: 1.5vw;
+    background: #001B48;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 0.8vh 1.5vw;
+    font-size: 1.6vh;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+    border-radius: 23vh;
+}
+
+.btn-connect:hover {
+    background: linear-gradient(90deg, #43a047, #66bb6a);
+    transform: scale(1.05);
+}
+
+.status-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+}
+
+.dot-green  { background: #00c853; }
+.dot-red    { background: #ff1744; }
+.dot-yellow { background: #ffd600; }
+
+.card h3 {
+    margin-top: 0;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+/* placeholder chart */
+.chart-placeholder {
+    height: 150px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+}

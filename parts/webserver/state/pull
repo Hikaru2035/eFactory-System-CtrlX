@@ -6,8 +6,8 @@ assets:
   stage-packages:
   - libnorm1=1.5.9+dfsg-2
   - libpgm-5.3-0=5.3.128~dfsg-2
-  - libsodium23=1.0.18-1build2
-  - libsystemd-dev=249.11-0ubuntu3.16
+  - libsodium23=1.0.18-1ubuntu0.22.04.1
+  - libsystemd-dev=249.11-0ubuntu3.17
   - libzmq5=4.3.4-2
 extracted_metadata:
   files: []

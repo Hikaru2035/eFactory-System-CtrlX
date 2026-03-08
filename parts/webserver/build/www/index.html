@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <title>eFactory System</title>
     <link rel="icon" type="image/jpg" sizes="16x16" href="/python-webserver/favicon.png">
@@ -11,6 +12,10 @@
 </head>
 
 <body>
+    <video autoplay muted loop playsinline class="bg-video">
+        <source src="/python-webserver/ctrlx_background_home.mp4" type="video/mp4">
+    </video>
+
     <!-- Header -->
     <div class="topbar">
         <div class="topbar-left">
@@ -19,10 +24,10 @@
         </div>
         <div class="nav">
             <a href="/python-webserver?token=$(token)" class="chip">Home</a>
-            <a href="/python-webserver/scada.html?token=$(token)" class="chip">SCADA</a>
-            <a href="/python-webserver/mes.html?token=$(token)" class="chip">MES</a>
-            <a href="/python-webserver/cloud.html?token=$(token)" class="chip">Cloud</a>
-            <a href="/python-webserver/admin.html?token=$(token)" class="chip">Admin</a>
+            <a href="/python-webserver/ui_scada.html?token=$(token)" class="chip">SCADA</a>
+            <a href="/python-webserver/ui_mes.html?token=$(token)" class="chip">MES</a>
+            <a href="/python-webserver/ui_cloud.html?token=$(token)" class="chip">Cloud</a>
+            <a href="/python-webserver/ui_admin.html?token=$(token)" class="chip">Admin</a>
         </div>
     </div>
 
@@ -30,41 +35,44 @@
         <!-- Left Top Cards (OEE + OBJ Moni) -->
         <div class="left-top">
             <div class="blank"></div>
-
             <div class="card dark">
-                <h3>MACHINE OEE</h3>
+                <h3>AVERAGE MACHINE OEE</h3>
                 <div class="oee-column">
                     <div class="oee-content">
-                        <div class="oee-value" id="oee">--</div>
+                        <div class="oee-value" id="avg-oee">--</div>
                         <ul class="oee-list">
-                        <li><span class="label">Availability</span><span class="value" id="availability">--</span></li>
-                        <li><span class="label">Performance</span><span class="value" id="performance">--</span></li>
-                        <li><span class="label">Quality</span><span class="value" id="quality">--</span></li>
+                            <li><span class="label">Availability</span><span class="value"
+                                    id="avg-availability">--</span></li>
+                            <li><span class="label">Performance</span><span class="value" id="avg-performance">--</span>
+                            </li>
+                            <li><span class="label">Quality</span><span class="value" id="avg-quality">--</span></li>
                         </ul>
                     </div>
-                    <ul class="oee-nav">
-                        <li>Previous</li>
-                        <li>Factory A</li>
-                        <li>Next</li>
-                    </ul>
                 </div>
             </div>
-
             <div class="card">
                 <h3>OBJECT PLACEMENT MONITORING</h3>
                 <div class="object-grid">
-                <div class="obj-item">
-                    35<br />Object1<br /><span class="badge ok">✓</span>
-                </div>
-                <div class="obj-item">
-                    35<br />Object2<br /><span class="badge ok">✓</span>
-                </div>
-                <div class="obj-item">
-                    35<br />Object3<br /><span class="badge warn">!</span>
-                </div>
-                <div class="obj-item">
-                    35<br />Object4<br /><span class="badge ok">✓</span>
-                </div>
+                    <div class="obj-item">
+                        <span class="servo-title">Driver A</span>
+                        <br />Status<br>
+                        <span id="driver1-status" class="badge"></span>
+                    </div>
+                    <div class="obj-item">
+                        <span class="servo-title">Core A</span>
+                        <br />Status<br />
+                        <span id="core1-status" class="badge"></span>
+                    </div>
+                    <div class="obj-item">
+                        <span class="servo-title">Driver B</span>
+                        <br />Status<br />
+                        <span id="driver2-status" class="badge"></span>
+                    </div>
+                    <div class="obj-item">
+                        <span class="servo-title">Core B</span>
+                        <br />Status<br />
+                        <span id="core2-status" class="badge"></span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -74,14 +82,14 @@
             <div class="card">
                 <h3>ENVIRONMENTAL MONITORING</h3>
                 <div class="env-charts">
-                <div class="gauge-container">
-                    <canvas id="tempGauge"></canvas>
-                    <div class="gauge-label">AVG. Temperature</div>
-                </div>
-                <div class="gauge-container">
-                    <canvas id="humidityGauge"></canvas>
-                    <div class="gauge-label">AVG. Humidity</div>
-                </div>
+                    <div class="gauge-container">
+                        <canvas id="tempGauge"></canvas>
+                        <div class="gauge-label">AVG. Temperature</div>
+                    </div>
+                    <div class="gauge-container">
+                        <canvas id="humidityGauge"></canvas>
+                        <div class="gauge-label">AVG. Humidity</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -92,134 +100,265 @@
                 <h3>RUNNING SCHEDULE</h3>
                 <canvas id="scheduleChart"></canvas>
             </div>
-
             <div class="card">
                 <h3>ERRORS LOG</h3>
                 <section class="table_body">
                     <table>
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Location</th>
-                                <th>Order Date</th>
-                                <th>Status</th>
-                                <th>Amount</th>
+                                <th>Time</th>
+                                <th>Description</th>
+                                <th>Type</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            $(error_rows)
-                        </tbody>
+                        <tbody id="error-log-body"></tbody>
                     </table>
-                </section> 
+                </section>
             </div>
         </div>
     </div>
 
     <script>
-        // Running Schedule
-        new Chart(document.getElementById('scheduleChart'), {
+        const token = "$(token)";
+
+        // Create Chart
+        scheduleChart = new Chart(document.getElementById('scheduleChart'), {
             type: 'bar',
             data: {
-                labels: ['01/01','02/01','03/01','04/01','05/01','06/01','07/01'],
+                labels: ['01/01', '02/01', '03/01', '04/01', '05/01', '06/01', '07/01'],
                 datasets: [{
-                data: [20,12,22,21,19,10,23],
-                backgroundColor: '#001B48'
+                    data: [0, 0, 0, 0, 0, 0, 0],
+                    backgroundColor: '#001B48'
                 }]
             },
             options: {
                 responsive: true,
                 plugins: {
-                legend: { display: false },
-                datalabels: {
-                    anchor: 'end',
-                    align: 'end',
-                    color: '#001B48',
-                    font: { weight: 'bold' }
-                }
+                    legend: { display: false },
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'end',
+                        color: '#001B48',
+                        font: { weight: 'bold' }
+                    }
                 },
                 scales: {
-                x: {
-                    ticks: {
-                    color: '#001B48',
-                    font: { size: 12 }
+                    x: {
+                        ticks: {
+                            color: '#001B48',
+                            font: { size: 12 }
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: '#001B48'
+                        }
                     }
-                },
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                    color: '#001B48'
-                    }
-                }
                 }
             },
             plugins: [ChartDataLabels]
         });
-
-        // Gauge chart
         const gaugeText = {
             id: 'gaugeText',
             afterDraw(chart, args, options) {
-            const {ctx, chartArea: {width, height}} = chart;
-            ctx.save();
-            ctx.font = 'bold 24px Arial';
-            ctx.fillStyle = '#001B48';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            const value = chart.config.data.datasets[0].data[0];
-            const unit = chart.config.options.plugins.gaugeUnit || ''; // lấy unit
-            ctx.fillText(value + unit, width / 2, height / 2);
+                const { ctx, chartArea: { width, height } } = chart;
+                ctx.save();
+                ctx.font = 'bold 24px Arial';
+                ctx.fillStyle = '#001B48';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                const value = chart.config.data.datasets[0].data[0];
+                const unit = chart.config.options.plugins.gaugeUnit || ''; // lấy unit
+                ctx.fillText(value + unit, width / 2, height / 2);
             }
         };
         function createGauge(ctx, value, color, unit) {
             return new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                datasets: [{
-                data: [value, 100 - value],
-                backgroundColor: [color, '#001B48'],
-                borderWidth: 0
-                }]
-            },
-            options: {
-                cutout: '65%',
-                plugins: {
-                legend: { display: false },
-                tooltip: { enabled: false },
-                gaugeUnit: unit
-                }
-            },
-            plugins: [gaugeText]
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [value, 100 - value],
+                        backgroundColor: [color, '#001B48'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    cutout: '65%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false },
+                        gaugeUnit: unit
+                    }
+                },
+                plugins: [gaugeText]
             });
         }
-        
-        const token = "$(token)"; // server đã render token
 
+        // OBJ Monitoring
+        function updateStatus(elementId, status) {
+            const badge = document.getElementById(elementId);
+            if (!badge) {
+                console.warn(`[DEBUG] Element not found: ${elementId}`);
+                return;
+            }
+
+            if (typeof status === "string") {
+                const trimmed = status.trim();
+                if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
+                    try {
+                        status = JSON.parse(trimmed);
+                        console.log(`Parsed JSON status for ${elementId}:`, status);
+                    } catch (e) {
+                        console.error(`JSON parse failed for ${elementId}:`, e);
+                    }
+                }
+            }
+
+            if (typeof status === "object" && status !== null) {
+                const firstKey = Object.keys(status)[0];
+                status = status[firstKey];
+                console.log(`Extracted status for ${elementId}:`, status);
+            }
+
+            status = String(status || "").toUpperCase();
+
+            switch (status) {
+                case "WORKING":
+                    badge.textContent = "✓";
+                    badge.className = "badge ok";
+                    break;
+
+                case "STANDBY":
+                case "ERROR":
+                    badge.textContent = "!";
+                    badge.className = "badge warn";
+                    break;
+
+                default:
+                    badge.textContent = "?";
+                    badge.className = "badge";
+                    console.warn(`Unknown status for ${elementId}: "${status}"`);
+                    break;
+            }
+        }
+
+        // Environment Monitoring
         const tempGauge = createGauge(document.getElementById('tempGauge'), 0, '#018ABE', '℃');
         const humidityGauge = createGauge(document.getElementById('humidityGauge'), 0, '#018ABE', '%');
 
-        function updateData() {
-            fetch(`/python-webserver/api/data?token=${token}`)
-                .then(res => res.json())
-                .then(data => {
-                    // Update OEE text
-                    document.getElementById("availability").textContent = data.availability;
-                    document.getElementById("performance").textContent = data.performance;
-                    document.getElementById("quality").textContent = data.quality;
-                    document.getElementById("oee").textContent = data.oee;
-
-                    // Update Gauges
-                    tempGauge.data.datasets[0].data = [data.temperature, 100 - data.temperature];
-                    tempGauge.update();
-
-                    humidityGauge.data.datasets[0].data = [data.humidity, 100 - data.humidity];
-                    humidityGauge.update();
-                })
-                .catch(err => console.error("Polling error:", err));
+        // Schedule Chart Value Setup
+        const scheduleLabels = [
+            '01/01', '02/01', '03/01',
+            '04/01', '05/01', '06/01', '07/01'
+        ];
+        function extractSchedules(avg) {
+            const values = [];
+            for (let i = 1; i <= 7; i++) {
+                values.push(avg[`schedule${i}`]);
+            }
+            return values;
         }
 
-        updateData();
-        setInterval(updateData, 1000);
+        // Error Logs Business Logic
+        const previousStatus = {};
+        function scanStatus(obj, path = "") {
+            for (const key in obj) {
+                const value = obj[key];
+                const currentPath = path ? `${path}.${key}` : key;
 
+                if (key === "status" && typeof value === "string") {
+                    handleStatusChange(currentPath, value);
+                }
+                if (typeof value === "object" && value !== null) {
+                    scanStatus(value, currentPath);
+                }
+            }
+        }
+        function handleStatusChange(key, newStatus) {
+            newStatus = String(newStatus || "").toUpperCase();
+            const oldStatus = previousStatus[key];
+            if (oldStatus !== undefined && oldStatus !== newStatus) {
+                let type = "MESSAGE";
+                let message = "Recovered";
+
+                if (newStatus === "ERROR") {
+                    type = "ERROR";
+                    message = "Device failure detected";
+                }
+                else if (newStatus === "STANDBY") {
+                    type = "WARN";
+                    message = "Warning condition";
+                }
+                createErrorLog(key, message, type);
+            }
+            previousStatus[key] = newStatus;
+        }
+        function createErrorLog(device, message, type) {
+            const table = document.getElementById("error-log-body");
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${new Date().toLocaleTimeString()}</td>
+                <td>${device} - ${message}</td>
+                <td class="${type.toLowerCase()}">${type}</td>
+            `;
+
+            table.prepend(row);
+            if (table.rows.length > 20)
+                table.deleteRow(20);
+        }
+
+        // Fetch AVG. Data
+        async function fetchData() {
+            try {
+                const res = await fetch(`/python-webserver/api/data?token=${token}`);
+                const data = await res.json();
+                return data;
+            } catch (err) {
+                console.error("Polling error:", err);
+                return null;
+            }
+        }
+        async function updateDataFactory() {
+            const data = await fetchData();
+            if (!data) return;
+
+            document.getElementById("avg-availability").textContent = data.avg.availability;
+            document.getElementById("avg-performance").textContent = data.avg.performance;
+            document.getElementById("avg-quality").textContent = data.avg.quality;
+            document.getElementById("avg-oee").textContent = data.avg.oee;
+
+            // Gauges
+            tempGauge.data.datasets[0].data = [data.avg.temperature, 100 - data.avg.temperature];
+            tempGauge.update();
+            humidityGauge.data.datasets[0].data = [data.avg.humidity, 100 - data.avg.humidity];
+            humidityGauge.update();
+
+            // Status
+            updateStatus("driver1-status", data.factoryA.status.driver);
+            updateStatus("driver2-status", data.factoryB.status.driver);
+            updateStatus("core1-status", data.factoryB.status.driver);
+            updateStatus("core2-status", data.factoryB.status.driver);
+
+            // ===== Schedule Chart (7 values) =====
+            const schedulesValue = extractSchedules(data.avg);
+
+            scheduleChart.data.labels = scheduleLabels;
+            scheduleChart.data.datasets[0].data = schedulesValue;
+
+            console.log("Schedule values:", schedulesValue);
+            scheduleChart.update();
+
+            // ===== Error Logs =====
+            scanStatus(data);
+        }
+
+        // Refresh loop
+        updateDataFactory();
+        setInterval(() => {
+            updateDataFactory();
+        }, 500);
     </script>
 </body>
+
 </html>
