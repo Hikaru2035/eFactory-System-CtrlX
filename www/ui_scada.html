@@ -15,6 +15,31 @@
 
 <body>
 
+    <div id="detailModal" class="detail-modal">
+
+        <div class="detail-window">
+
+            <div class="detail-header">
+                <span class="detail-title">Device Information</span>
+                <span class="detail-close" onclick="closeDetail()">✕</span>
+            </div>
+
+            <div class="detail-body">
+
+                <div class="detail-image">
+                    <img id="detailImage" src="" alt="device">
+                </div>
+
+                <div class="detail-info">
+                    <pre id="detailContent"></pre>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
     <video autoplay muted loop playsinline class="bg-video">
         <source src="/python-webserver/ctrlx_background_scada.mp4" type="video/mp4">
     </video>
@@ -537,27 +562,27 @@
         function openDetail(device) {
             const machines = {
                 sensor1: {
-                    img: "SL1_Sensor.png",
+                    img: "/python-webserver/SL1_Sensor.png",
                     info: "Sensor 1\nTemperature sensor\nFactory A"
                 },
                 sensor2: {
-                    img: "SL1_Sensor.png",
+                    img: "/python-webserver/SL1_Sensor.png",
                     info: "Sensor 2\nTemperature sensor\nFactory A"
                 },
                 servo1: {
-                    img: "SL1_ctrlx_core_trans.png",
+                    img: "/python-webserver/SL1_ctrlx_core_trans.png",
                     info: "Servo X\nAxis motor"
                 },
                 servo2: {
-                    img: "SL1_ctrlx_core_trans.png",
+                    img: "/python-webserver/SL1_ctrlx_core_trans.png",
                     info: "Servo Y\nAxis motor"
                 },
                 driver: {
-                    img: "SL_3_ctrlx_drive.png",
+                    img: "/python-webserver/SL_3_ctrlx_drive.png",
                     info: "Motor driver\nMax speed: 3000 rpm"
                 },
                 controller: {
-                    img: "SL1_ctrlx_core_trans.png",
+                    img: "/python-webserver/SL1_ctrlx_core_trans.png",
                     info: "Main controller PLC"
                 }
             };

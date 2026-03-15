@@ -7,9 +7,8 @@ body {
     height: 100%;
     margin: 0;
     overflow: hidden;
-    font-family: Arial, sans-serif;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
     background: transparent;
-    color: #0e2233;
 }
 
 .bg-video {
@@ -137,32 +136,27 @@ body {
 .grid-header,
 .grid-row {
     display: grid;
-    grid-template-columns:
-        1.6fr
-        /* Device */
-        0.9fr
-        /* Status */
-        1.4fr
-        /* Parameter */
-        0.7fr
-        /* Value */
-        0.7fr
-        /* Unit */
-        1fr
-        /* Temp */
-        0.5fr;
-    /* Detailed Info (nhỏ lại như bạn muốn) */
-
+    grid-template-columns: repeat(7, 1fr);
     align-items: center;
-    padding: 12px 16px;
+    text-align: center;
+    padding: 12px 20px;
+}
+
+.grid-header div,
+.grid-row div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .grid-header {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--text-muted);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #cfe3ff;
     border-bottom: 2px solid var(--border-color);
     text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
 }
 
 .grid-row {
@@ -174,28 +168,28 @@ body {
 }
 
 .device-name {
-    font-size: 0.95rem;
-    color: #e2e8f0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #e6f0ff;
 }
 
 .parameter {
-    color: var(--text-muted);
-    font-size: 0.95rem;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    font-size: 1rem;
+    color: #9fb6d9;
     white-space: nowrap;
 }
 
 
 .digital-value {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 1.3rem;
-    color: var(--accent-blue);
-    text-align: right;
-    padding-right: 12px;
-    letter-spacing: 1px;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    font-size: 1rem;
+    color: #5cd6ff;
 }
 
 .unit {
-    font-family: 'Share Tech Mono', monospace;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    font-size: 1rem;
     color: var(--text-muted);
 }
 
@@ -289,18 +283,15 @@ body {
 }
 
 .temp-val {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 1.05rem;
-    color: var(--accent-blue);
-    min-width: 60px;
-    text-align: right;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+    font-size: 1rem;
+    color: #5cd6ff;
 }
 
 /* ===== detailed info button ===== */
 .detail-col {
     display: flex;
     justify-content: center;
-    align-items: center;
 }
 
 .detail-btn {
@@ -354,4 +345,143 @@ body {
     color: white;
     font-size: 14px;
     line-height: 1.4;
+}
+
+.grid-row:hover {
+    background: rgba(56, 189, 248, 0.06);
+}
+
+/* ===== MODAL BACKGROUND ===== */
+
+.detail-modal{
+    position:fixed;
+    top:0;
+    left:0;
+
+    width:100%;
+    height:100%;
+
+    background:rgba(0,0,0,0.55);
+
+    display:none;
+    justify-content:center;
+    align-items:center;
+
+    z-index:999;
+}
+
+/* ===== WINDOW ===== */
+
+.detail-window{
+
+    width:50%;
+    height:50%;
+
+    background:#001B48;
+
+    border-radius:14px;
+
+    box-shadow:0 20px 50px rgba(0,0,0,0.6);
+
+    display:flex;
+    flex-direction:column;
+
+    padding:25px;
+
+    box-shadow:0 0 35px rgba(0,140,255,0.35);
+}
+
+/* ===== HEADER ===== */
+
+.detail-header{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    margin-bottom:15px;
+
+}
+
+.detail-title{
+    color:white;
+    font-size:22px;
+    font-weight:bold;
+}
+
+.detail-close{
+
+    color:white;
+    font-size:26px;
+    cursor:pointer;
+
+}
+
+.detail-close:hover{
+    color:#5cd6ff;
+}
+
+/* ===== BODY ===== */
+
+.detail-body{
+
+    flex:1;
+
+    display:flex;
+    gap:30px;
+
+}
+
+/* ===== IMAGE ===== */
+
+.detail-image{
+
+    flex:0.9;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    overflow:hidden;
+
+}
+
+.detail-image img{
+
+    max-width:90%;
+    max-height:85%;
+
+    object-fit:contain;
+
+}
+
+/* ===== INFO ===== */
+
+.detail-info{
+
+    flex:1.1;
+
+    display:flex;
+    align-items:center;
+
+    color:white;
+
+    font-weight:700;
+
+    font-size:22px;
+
+    text-transform:uppercase;
+
+    letter-spacing:1px;
+
+}
+
+.detail-info pre{
+
+    white-space:pre-line;
+
+    font-family:inherit;
+
+    line-height:1.6;
+
 }

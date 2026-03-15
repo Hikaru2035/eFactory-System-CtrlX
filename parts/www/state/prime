@@ -16,6 +16,7 @@ files: !!set
   www/invalid-token.html: null
   www/logo.png: null
   www/script.js: null
+  www/style_cloud.css: null
   www/style_mes.css: null
   www/style_scada.css: null
   www/stylesheet.css: null
