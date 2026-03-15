@@ -261,8 +261,7 @@
         }
 
         // Error Logs Business Logic
-        const previousStatus = {};
-        function scanStatus(obj, path = "") {
+        const previousStatus = JSON.parse(localStorage.getItem("efactory_prev_status") || "{}"); function scanStatus(obj, path = "") {
             for (const key in obj) {
                 const value = obj[key];
                 const currentPath = path ? `${path}.${key}` : key;
@@ -278,34 +277,59 @@
         function handleStatusChange(key, newStatus) {
             newStatus = String(newStatus || "").toUpperCase();
             const oldStatus = previousStatus[key];
+
             if (oldStatus !== undefined && oldStatus !== newStatus) {
                 let type = "MESSAGE";
-                let message = "Recovered";
+                let message = `Changed from ${oldStatus} to ${newStatus}`;
 
                 if (newStatus === "ERROR") {
                     type = "ERROR";
                     message = "Device failure detected";
                 }
-                else if (newStatus === "STANDBY") {
+                else if (newStatus === "STANDBY" || newStatus === "WARNING") {
                     type = "WARN";
-                    message = "Warning condition";
+                    message = "Warning condition detected";
                 }
+                else if (oldStatus === "ERROR" || oldStatus === "STANDBY") {
+                    type = "SUCCESS";
+                    message = "System Recovered";
+                }
+
                 createErrorLog(key, message, type);
             }
             previousStatus[key] = newStatus;
+            localStorage.setItem("efactory_prev_status", JSON.stringify(previousStatus));
+        }
+        function renderLogs() {
+            const table = document.getElementById("error-log-body");
+            if (!table) return;
+            const logs = JSON.parse(localStorage.getItem("efactory_logs") || "[]");
+            table.innerHTML = "";
+            logs.forEach(log => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+            <td>${log.time}</td>
+            <td>${log.device} - ${log.message}</td>
+            <td class="${log.type.toLowerCase()}">${log.type}</td>
+        `;
+                table.appendChild(row);
+            });
         }
         function createErrorLog(device, message, type) {
-            const table = document.getElementById("error-log-body");
-            const row = document.createElement("tr");
-            row.innerHTML = `
-                <td>${new Date().toLocaleTimeString()}</td>
-                <td>${device} - ${message}</td>
-                <td class="${type.toLowerCase()}">${type}</td>
-            `;
+            const logEntry = {
+                time: new Date().toLocaleTimeString(),
+                device: device,
+                message: message,
+                type: type
+            };
+            let logs = JSON.parse(localStorage.getItem("efactory_logs") || "[]");
+            logs.unshift(logEntry);
 
-            table.prepend(row);
-            if (table.rows.length > 20)
-                table.deleteRow(20);
+            if (logs.length > 50) logs = logs.slice(0, 50);
+
+            localStorage.setItem("efactory_logs", JSON.stringify(logs));
+
+            renderLogs();
         }
 
         // Fetch AVG. Data
@@ -353,6 +377,7 @@
             scanStatus(data);
         }
 
+        renderLogs();
         // Refresh loop
         updateDataFactory();
         setInterval(() => {
