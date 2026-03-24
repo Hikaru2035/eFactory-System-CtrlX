@@ -32,7 +32,13 @@
     <div class="container">
         <!-- Left Card (DataLayer Table) -->
         <div class="card">
-            <div class="table-wrapper">
+            <div class="view-buttons">
+                <button id="btnTable" class="view-btn active" onclick="showTable()">Detailed Table</button>
+                <button id="btnMetrics" class="view-btn" onclick="showMetrics()">CtrlX Metrics</button>
+            </div>
+
+            <!-- Detailed Table -->
+            <div id="tableView" class="table-wrapper">
                 <table class="main-table">
                     <thead>
                         <tr>
@@ -46,6 +52,26 @@
                     <tbody></tbody>
                 </table>
             </div>
+
+            <!-- CtrlX Metrics -->
+            <div id="metricsView" class="metrics-view">
+
+                <div class="metrics-row">
+                    <canvas id="memChart"></canvas>
+                </div>
+
+                <div class="metrics-row">
+                    <canvas id="cpuChart"></canvas>
+                    <canvas id="memAvailableChart"></canvas>
+                </div>
+
+                <div class="metrics-row">
+                    <canvas id="bufferChart"></canvas>
+                    <canvas id="cacheChart"></canvas>
+                </div>
+
+            </div>
+
         </div>
 
         <!-- Right Cards (Cloud Connection + Baud Rate + Graphs)  -->
@@ -62,12 +88,27 @@
                     <p><strong>Broker:</strong> <span id="cloudBroker">--</span></p>
                     <p><strong>Last Sync:</strong> <span id="lastSync">--</span></p>
                 </div>
-
-                <button id="btnConnect" class="btn-connect">Connect Data</button>
             </div>
-            <div class="card">
-                <h3>BAUD RATE</h3>
-                <div class="chart-placeholder"></div>
+            <div class="card bandwidth-card">
+                <h3>MQTT DATA RATE</h3>
+
+                <div class="bandwidth-container">
+
+                    <div class="gauge-wrapper">
+                        <canvas id="bandwidthGauge"></canvas>
+                        <div id="gaugeValue">0 kB/s</div>
+                    </div>
+
+                    <div class="bandwidth-info">
+                        <p><strong>Current:</strong> <span id="bwCurrent">0</span> kB/s</p>
+                        <p><strong>Average:</strong> <span id="bwAvg">0</span> kB/s</p>
+                        <p><strong>Peak:</strong> <span id="bwPeak">0</span> kB/s</p>
+
+                        <div class="bw-bar">
+                            <div id="bwBarFill"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="card">
                 <h3>RUNNING SCHEDULE</h3>
@@ -78,8 +119,41 @@
     <script>
         const token = "$(token)";
 
-        //===== SCHEDULE CHART =====
-        scheduleChart = new Chart(document.getElementById('scheduleChart'), {
+        // SCHEDULE CHART
+        const gaugeNeedle = {
+            id: 'gaugeNeedle',
+            afterDatasetDraw(chart, args, options) {
+
+                const { ctx } = chart;
+                const data = chart.data.datasets[0].data[0];
+                const total = chart.data.datasets[0].data[0] + chart.data.datasets[0].data[1];
+
+                const angle = Math.PI * 1.2 * (data / total) - Math.PI * 1.2;
+
+                const cx = chart.getDatasetMeta(0).data[0].x;
+                const cy = chart.getDatasetMeta(0).data[0].y;
+
+                ctx.save();
+
+                ctx.translate(cx, cy);
+                ctx.rotate(angle);
+
+                ctx.beginPath();
+                ctx.moveTo(0, -3);
+                ctx.lineTo(120, 0);
+                ctx.lineTo(0, 3);
+                ctx.fillStyle = "#001B48";
+                ctx.fill();
+
+                ctx.restore();
+
+                ctx.beginPath();
+                ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+                ctx.fillStyle = "#001B48";
+                ctx.fill();
+            }
+        };
+        const scheduleChart = new Chart(document.getElementById('scheduleChart'), {
             type: 'bar',
             data: {
                 labels: ['01/01', '02/01', '03/01', '04/01', '05/01', '06/01', '07/01'],
@@ -89,6 +163,7 @@
                 }]
             },
             options: {
+                maintainAspectRatio: false,
                 responsive: true,
                 plugins: {
                     legend: { display: false },
@@ -108,6 +183,7 @@
                     },
                     y: {
                         beginAtZero: true,
+                        max: 16,
                         ticks: {
                             color: '#001B48'
                         }
@@ -128,7 +204,96 @@
             return values;
         }
 
-        //===== CLOUD STATUS =====
+        // BANDWIDTH
+        let currentBandwidth = 0;
+        let maxBandwidth = localStorage.getItem("maxBandwidth");
+        maxBandwidth = maxBandwidth ? parseFloat(maxBandwidth) : 200;
+        let bwHistory = [];
+        let bwPeak = localStorage.getItem("bwPeak");
+        bwPeak = bwPeak ? parseFloat(bwPeak) : 0;
+        const bandwidthGauge = new Chart(
+            document.getElementById('bandwidthGauge'), {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [0, 200],
+                    backgroundColor: [
+                        '#ffd600',
+                        '#001B48'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                rotation: -120,
+                circumference: 240,
+                cutout: '65%',
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: false }
+                }
+            },
+            plugins: [gaugeNeedle]
+        });
+        function updateBandwidth(value) {
+            currentBandwidth = value;
+
+            if (value === undefined || value === null)
+                value = 0;
+
+            if (value > maxBandwidth) {
+                maxBandwidth = value * 1.2;
+                localStorage.setItem("maxBandwidth", maxBandwidth);
+            }
+
+            bandwidthGauge.data.datasets[0].data = [
+                value,
+                maxBandwidth - value
+            ];
+
+            let color;
+
+            if (value < 120) color = "#00c853";
+            else if (value < 150) color = "#ffd600";
+            else color = "#ff1744";
+
+            bandwidthGauge.data.datasets[0].backgroundColor[0] = color;
+
+            bandwidthGauge.update();
+
+            document.getElementById("gaugeValue").textContent =
+                value.toFixed(1) + " kB/s";
+
+            document.getElementById("bwCurrent").textContent =
+                value.toFixed(1);
+
+            bwHistory.push(value);
+            if (bwHistory.length > 20)
+                bwHistory.shift();
+
+            const avg = bwHistory.reduce((a, b) => a + b, 0) / bwHistory.length;
+
+            document.getElementById("bwAvg").textContent = avg.toFixed(1);
+
+            if (value > bwPeak) {
+                bwPeak = value;
+                localStorage.setItem("bwPeak", bwPeak);
+            }
+
+            document.getElementById("bwPeak").textContent =
+                bwPeak.toFixed(1);
+            const percent = (value / maxBandwidth) * 100;
+            const bar = document.getElementById("bwBarFill");
+
+            bar.style.width = percent + "%";
+            bar.style.background = color;
+        }
+        function resetBandwidth() {
+            bwPeak = 0;
+            localStorage.setItem("bwPeak", 0);
+        }
+
+        // CLOUD STATUS
         function setCloudStatus(status) {
             const dot = document.getElementById("cloudStatusDot");
             const text = document.getElementById("cloudStatusText");
@@ -288,6 +453,135 @@
             });
         }
 
+        // METRICS
+        function showTable() {
+            document.getElementById("tableView").style.display = "block";
+            document.getElementById("metricsView").style.display = "none";
+
+            btnTable.classList.add("active");
+            btnMetrics.classList.remove("active");
+        }
+        function showMetrics() {
+            document.getElementById("tableView").style.display = "none";
+            document.getElementById("metricsView").style.display = "flex";
+
+            btnMetrics.classList.add("active");
+            btnTable.classList.remove("active");
+        }
+        const historyLength = 30;
+        function createLineChart(ctx, label) {
+            return new Chart(ctx, {
+                type: "line",
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: label,
+                        data: [],
+                        borderColor: "#001B48",
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    scales: {
+                        x: { display: false },
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#001B48',
+                                font: {
+                                    size: 14,      
+                                    weight: 'bold' 
+                                },
+                                padding: 10        
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                font: {
+                                    size: 13, 
+                                    weight: '600'
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        const cpuChart = createLineChart(
+            document.getElementById("cpuChart"),
+            "CPU Utilization"
+        );
+        const memAvailableChart = createLineChart(
+            document.getElementById("memAvailableChart"),
+            "Mem Available"
+        );
+        const bufferChart = createLineChart(
+            document.getElementById("bufferChart"),
+            "Mem Buffers"
+        );
+        const cacheChart = createLineChart(
+            document.getElementById("cacheChart"),
+            "Mem Cache"
+        );
+        const memChart = new Chart(
+            document.getElementById("memChart"), {
+            type: "line",
+            data: {
+                labels: [],
+                datasets: [
+                    {
+                        label: "Mem Free",
+                        data: [],
+                        borderColor: "#00c853",
+                        tension: 0.3
+                    },
+                    {
+                        label: "Mem Used",
+                        data: [],
+                        borderColor: "#ff1744",
+                        tension: 0.3
+                    }
+                ]
+            },
+            options: {
+                maintainAspectRatio: false,
+                animation: false,
+                scales: { x: { display: false } }
+            }
+        });
+        function updateLine(chart, value) {
+
+            chart.data.labels.push("");
+
+            chart.data.datasets[0].data.push(value);
+
+            if (chart.data.labels.length > historyLength) {
+                chart.data.labels.shift();
+                chart.data.datasets[0].data.shift();
+            }
+
+            chart.update();
+        }
+        function updateMemChart(free, used) {
+
+            memChart.data.labels.push("");
+
+            memChart.data.datasets[0].data.push(free);
+            memChart.data.datasets[1].data.push(used);
+
+            if (memChart.data.labels.length > historyLength) {
+                memChart.data.labels.shift();
+                memChart.data.datasets.forEach(d => d.data.shift());
+            }
+
+            memChart.update();
+        }
+
         // CLOUD STATUS
         function updateCloudInfo(data) {
             const cloud = data?.avg?.cloud;
@@ -345,12 +639,28 @@
                 scheduleChart.data.datasets[0].data = schedulesValue;
                 scheduleChart.update();
             }
+            if (data.avg.system.bandwidth) {
+                updateBandwidth(
+                    data.avg.system.bandwidth
+                );
+            }
+            if (data.avg?.system) {
+
+                const m = data.avg.system;
+
+                updateLine(cpuChart, m.cpuUtilization);
+                updateLine(memAvailableChart, m.memAvailable);
+                updateLine(bufferChart, m.memBuffers);
+                updateLine(cacheChart, m.memCache);
+
+                updateMemChart(m.memfree, m.memUsed);
+            }
             updateCloudInfo(data);
         }
 
         // Refresh loop
         updateUI();
-        setInterval(updateUI, 1000); 
+        setInterval(updateUI, 1000);
 
     </script>
 </body>

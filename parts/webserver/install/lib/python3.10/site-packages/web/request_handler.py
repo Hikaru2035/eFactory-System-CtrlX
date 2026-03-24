@@ -13,7 +13,6 @@ from urllib.parse import unquote, parse_qs, urlparse
 from json import dumps, loads
 
 import app.datalayer
-from app.aws_publisher import AWSPublisher
 
 data_layer: app.datalayer.DataLayer
 aws_publisher = None
@@ -136,6 +135,38 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                     return list(enum_dict.values())[0]
                 return str(enum_dict)
             
+            def extract_main_ip(addresses):
+                try:
+                    if not addresses:
+                        return None
+
+                    # Nếu là string JSON → parse
+                    if isinstance(addresses, str):
+                        import json
+                        addresses = json.loads(addresses)
+
+                    # Nếu là dict → lấy list bên trong
+                    if isinstance(addresses, dict):
+                        addresses = addresses.get("addresses", [])
+
+                    # Nếu là list → tìm IPv4
+                    if isinstance(addresses, list):
+                        for item in addresses:
+                            if isinstance(item, dict):
+                                ip = item.get("address")
+                                if ip:
+                                    ip_only = ip.split("/")[0]
+
+                                    # check IPv4 (cách đơn giản)
+                                    if "." in ip_only:
+                                        return ip_only
+
+                    return None
+
+                except Exception as e:
+                    print("IP parse error:", e)
+                    return None
+            
             # ------------------------- AVG FAC A+B -------------------------
             result, avg_availability_val    = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeeAvailAverage")
             result, avg_performance_val     = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeePerfAverage")
@@ -172,8 +203,25 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
 
             result, avg_time_counter_val     = data_layer.read_node("plc/app/Application/sym/PLC_PRG/timeCounter")
             result, avg_time_cycle_val       = data_layer.read_node("plc/app/Application/sym/PLC_PRG/timeCycle")
+            result, avg_bandwidth            = data_layer.read_node("plc/app/Application/sym/PLC_PRG/bandwithkBps")
             result, avg_user_level_val       = data_layer.read_node("plc/app/Application/sym/PLC_PRG/userLevel")
             result, avg_user_name_val        = data_layer.read_node("plc/app/Application/sym/PLC_PRG/userName")
+
+            result, avg_metric_cpu_utilization          = data_layer.read_node("framework/metrics/system/cpu-utilisation-percent")
+            result, avg_metric_mem_available            = data_layer.read_node("framework/metrics/system/memavailable-mb")
+            result, avg_metric_mem_buffers              = data_layer.read_node("framework/metrics/system/membuffers-mb")
+            result, avg_metric_mem_cache                = data_layer.read_node("framework/metrics/system/memcache-mb")
+            result, avg_metric_mem_free                 = data_layer.read_node("framework/metrics/system/memfree-mb")
+            result, avg_metric_mem_total                = data_layer.read_node("framework/metrics/system/memtotal-mb")
+            result, avg_metric_mem_used                 = data_layer.read_node("framework/metrics/system/memused-mb")
+            result, avg_metric_mem_percent              = data_layer.read_node("framework/metrics/system/memused-percent")
+
+            result, avg_info_addresses                  = data_layer.read_node("system/resources/network/interfaces/eth0/addresses")
+            result, avg_info_architecture               = data_layer.read_node("system/info/architecture")
+            result, avg_info_hostname                   = data_layer.read_node("system/info/hostname")
+            result, avg_info_macAddress                 = data_layer.read_node("system/info/macAddress")
+            result, avg_info_operatingSystem            = data_layer.read_node("system/info/operatingSystem")
+            result, avg_info_os_version                 = data_layer.read_node("system/info/osVersion")
 
             # ------------------------- FACTORY A -------------------------
             result, facA_availability_val   = data_layer.read_node("plc/app/Application/sym/PLC_PRG/oeeAvail1")
@@ -200,6 +248,8 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
             result, facA_sensor1_disInPos_val = data_layer.read_node("plc/app/Application/sym/PLC_PRG/sensorDistInPos1")
             result, facA_sensor2_disInPos_val = data_layer.read_node("plc/app/Application/sym/PLC_PRG/sensorDistInPos2")
             result, facA_driver_status_val  = data_layer.read_node("plc/app/Application/sym/PLC_PRG/driverStatus1")
+            result, facA_driver_on_val      = data_layer.read_node("plc/app/Application/sym/PLC_PRG/ON_drive")
+            result, facA_driver_start_val   = data_layer.read_node("plc/app/Application/sym/PLC_PRG/Start_drive")
 
             result, facA_sensor1_temp_val = data_layer.read_node("plc/app/Application/sym/PLC_PRG/sensorTemp1")
             result, facA_sensor2_temp_val = data_layer.read_node("plc/app/Application/sym/PLC_PRG/sensorTemp2")
@@ -290,7 +340,24 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
 
                     "system": {
                         "timeCounter": avg_time_counter_val,
-                        "timeCycle": avg_time_cycle_val
+                        "timeCycle": avg_time_cycle_val,
+                        "bandwidth": avg_bandwidth,
+                        "cpuUtilization": avg_metric_cpu_utilization,
+                        "memAvailable": avg_metric_mem_available,
+                        "memBuffers": avg_metric_mem_buffers,
+                        "memCache": avg_metric_mem_cache,
+                        "memfree": avg_metric_mem_free,
+                        "memTotal": avg_metric_mem_total,
+                        "memUsed": avg_metric_mem_used,
+                        "memPercent": avg_metric_mem_percent
+                    },
+
+                    "info": {
+                        "ip": extract_main_ip(avg_info_addresses),
+                        "hostname": avg_info_hostname,
+                        "architecture": avg_info_architecture,
+                        "os": avg_info_operatingSystem,
+                        "osVersion": avg_info_os_version
                     },
 
                     "user": {
@@ -334,7 +401,9 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                     "status": {
                         "sensor1": extract_enum_value(facA_sensor1_status_val),
                         "sensor2": extract_enum_value(facA_sensor2_status_val),
-                        "driver": extract_enum_value(facA_driver_status_val)
+                        "driver": extract_enum_value(facA_driver_status_val),
+                        "onDrive": facA_driver_on_val,
+                        "startDrive": facA_driver_start_val
                     },
                     "distance": {
                         "sensor1": facA_sensor1_disInPos_val,
@@ -544,12 +613,13 @@ class RequestHandler(http.server.BaseHTTPRequestHandler):
                 RequestHandler.readResult = 'INVALID NODE'
 
         if data['submit'][0] == 'Write Value':
-
             if 'node' in data and 'value' in data:
                 RequestHandler.writePath = data['node'][0]
-                RequestHandler.writeValue = data['value'][0]
-
-                # ctrlX Data Layer access
+                
+                raw_value = data['value'][0].lower() 
+                val_to_write = True if raw_value in ['true', '1'] else False
+                
+                RequestHandler.writeValue = val_to_write
                 RequestHandler.writeResult = data_layer.write_node(
                     RequestHandler.writePath, RequestHandler.writeValue)
 

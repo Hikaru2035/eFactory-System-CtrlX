@@ -371,6 +371,27 @@ thead th {
 tbody tr:nth-child(even) {
     background-color: rgba(0, 27, 72, 0.2);
 }
+.log-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:10px;
+}
+
+.reset-btn{
+    background:#001B48;
+    color:white;
+    border:none;
+    padding:6px 14px;
+    border-radius:6px;
+    cursor:pointer;
+    font-weight:bold;
+    transition:0.2s;
+}
+
+.reset-btn:hover{
+    background:#003a80;
+}
 
 @media (max-width: 1024px) {
     .stage {

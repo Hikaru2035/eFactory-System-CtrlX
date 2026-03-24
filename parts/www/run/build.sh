@@ -2,16 +2,16 @@
 set -e
 # Environment
 ## Part Environment
-export SNAPCRAFT_ARCH_TRIPLET="x86_64-linux-gnu"
+export SNAPCRAFT_ARCH_TRIPLET="aarch64-linux-gnu"
 export SNAPCRAFT_EXTENSIONS_DIR="/snap/snapcraft/7201/share/snapcraft/extensions"
 export SNAPCRAFT_PARALLEL_BUILD_COUNT="4"
 export SNAPCRAFT_PRIME="/home/boschrexroth/ctrlx-automation-sdk/samples-python/webserver/prime"
 export SNAPCRAFT_PROJECT_NAME="sdk-py-webserver"
-export SNAPCRAFT_PROJECT_VERSION="1.3.8"
+export SNAPCRAFT_PROJECT_VERSION="1.3.34"
 export SNAPCRAFT_PROJECT_DIR="/home/boschrexroth/ctrlx-automation-sdk/samples-python/webserver"
 export SNAPCRAFT_PROJECT_GRADE="stable"
 export SNAPCRAFT_STAGE="/home/boschrexroth/ctrlx-automation-sdk/samples-python/webserver/stage"
-export SNAPCRAFT_TARGET_ARCH="amd64"
+export SNAPCRAFT_TARGET_ARCH="arm64"
 export SNAPCRAFT_PART_SRC="/home/boschrexroth/ctrlx-automation-sdk/samples-python/webserver/parts/www/src"
 export SNAPCRAFT_PART_SRC_WORK="/home/boschrexroth/ctrlx-automation-sdk/samples-python/webserver/parts/www/src/"
 export SNAPCRAFT_PART_BUILD="/home/boschrexroth/ctrlx-automation-sdk/samples-python/webserver/parts/www/build"

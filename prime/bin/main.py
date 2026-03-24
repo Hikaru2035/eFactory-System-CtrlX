@@ -14,7 +14,6 @@ import web.request_handler
 import web.unix_socket_server
 
 import app.datalayer
-from app.aws_publisher import AWSPublisher
 
 httpServerPort = 12345
 token = "efactory"

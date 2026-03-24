@@ -1,7 +1,7 @@
 name: sdk-py-webserver
 title: eFactory Dashboard
-version: 1.3.8
-summary: Dashboard deveoped for ctrlX Factory Management
+version: 1.3.34
+summary: Dashboard developed for ctrlX Factory Management
 description: |
   This sample shows how to create a web server app in ctrlX
 base: core22

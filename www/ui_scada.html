@@ -14,11 +14,8 @@
 </head>
 
 <body>
-
     <div id="detailModal" class="detail-modal">
-
         <div class="detail-window">
-
             <div class="detail-header">
                 <span class="detail-title">Device Information</span>
                 <span class="detail-close" onclick="closeDetail()">✕</span>
@@ -240,7 +237,10 @@
                 <div class="grid-row">
                     <div class="device-name">Driver</div>
 
-                    <div id="driver-status" class="status">--</div>
+                    <div class="driver-control">
+                        <button id="driver-start-btn" class="ctrl-btn">START</button>
+                        <button id="driver-on-btn" class="ctrl-btn">ON</button>
+                    </div>
 
                     <div class="parameter">Current</div>
                     <div id="driver-current" class="digital-value">--</div>
@@ -430,6 +430,23 @@
                     el.textContent = "--";
             }
         }
+
+        function setDriverButtons(startVal, onVal) {
+            const startBtn = document.getElementById("driver-start-btn");
+            const onBtn = document.getElementById("driver-on-btn");
+
+            const isStarted = (startVal === true || startVal === "true" || startVal === 1);
+            const isOn = (onVal === true || onVal === "true" || onVal === 1);
+
+            startBtn.classList.toggle("btn-on", isStarted);
+            startBtn.classList.toggle("btn-off", !isStarted);
+            startBtn.textContent = isStarted ? "STARTED" : "START";
+
+            onBtn.classList.toggle("btn-on", isOn);
+            onBtn.classList.toggle("btn-off", !isOn);
+            onBtn.textContent = isOn ? "ON" : "OFF";
+        }
+
         /* ================= RENDER ================= */
         function renderFactory() {
             if (!factoryData) return;
@@ -500,10 +517,12 @@
                 f.machines.servo2.temperature.toFixed(1) + "°C";
 
             // Driver
-            setStatus(
-                document.getElementById("driver-status"),
-                f.status.driver
-            );
+            if (f.status?.driver && !isWriting) {
+                setDriverButtons(
+                    f.status.startDrive,
+                    f.status.onDrive
+                );
+            }
 
             /* ===== CONTROLLER ===== */
             if (f.devices?.controller) {
@@ -538,6 +557,66 @@
                     f.devices.sensors.sensor2.temperature.toFixed(1) + "°C";
         }
 
+        let isWriting = false;
+
+        async function toggleDriver(field, value) {
+            isWriting = true; // Chặn hàm render cập nhật từ API trong chốc lát
+
+            const node = field === "start"
+                ? "plc/app/Application/sym/PLC_PRG/Start_drive"
+                : "plc/app/Application/sym/PLC_PRG/ON_drive";
+
+            // Ép kiểu chuẩn cho bool8
+            const stringValue = value ? "true" : "false";
+
+            console.log(`[ACTION] Writing to ${node}: ${stringValue}`);
+
+            try {
+                const response = await fetch(`/python-webserver?token=${token}`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: `submit=Write Value&node=${encodeURIComponent(node)}&value=${stringValue}`
+                });
+
+                if (!response.ok) throw new Error("Network response was not ok");
+
+            } catch (err) {
+                console.error("Lỗi khi gửi lệnh PLC:", err);
+            } finally {
+                // Chờ 800ms để PLC kịp cập nhật giá trị mới vào Data Layer trước khi cho phép render lại
+                setTimeout(() => {
+                    isWriting = false;
+                }, 800);
+            }
+        }
+
+        function bindDriverEvents() {
+            const startBtn = document.getElementById("driver-start-btn");
+            const onBtn = document.getElementById("driver-on-btn");
+
+            startBtn.onclick = async () => {
+                const f = factoryData[currentFactory];
+                const isStarted = (f.status.startDrive === true || f.status.startDrive === "true" || f.status.startDrive === 1);
+                const newVal = !isStarted;
+                setDriverButtons(newVal, f.status.onDrive);
+                f.status.startDrive = newVal;
+
+                await toggleDriver("start", newVal);
+            };
+
+            onBtn.onclick = async () => {
+                const f = factoryData[currentFactory];
+                const isOn = (f.status.onDrive === true || f.status.onDrive === "true" || f.status.onDrive === 1);
+                const newVal = !isOn;
+                setDriverButtons(f.status.startDrive, newVal);
+                f.status.onDrive = newVal;
+
+                await toggleDriver("on", newVal);
+            };
+        }
+
         /* ================= HELPERS ================= */
         function updateGauge(chart, value) {
             chart.data.datasets[0].data = [value, 100 - value];
@@ -554,10 +633,11 @@
         document.getElementById("next-factory").onclick = switchFactory;
 
         // Refresh loop
+        bindDriverEvents();
         loadData();
         setInterval(() => {
-            loadData();   // <-- fetch lại data mới
-        }, 500);
+            loadData();
+        }, 1000);
 
         function openDetail(device) {
             const machines = {
@@ -596,7 +676,8 @@
         }
         function closeDetail() {
             document.getElementById("detailModal").style.display = "none";
-        }
+        }           
     </script>
 </body>
+
 </html>

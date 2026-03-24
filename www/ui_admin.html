@@ -7,11 +7,20 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/python-webserver/stylesheet.css">
+    <link rel="stylesheet" href="/python-webserver/style_admin.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 </head>
 
 <body>
+    <div id="auth-overlay">
+        <div class="auth-box">
+            <h2>Admin Management System</h2>
+            <input type="password" id="admin-pass-input" placeholder="Password...">
+            <button onclick="verifyAccess()">Log In</button>
+            <p id="auth-error" style="color: red; display: none; margin-top: 10px;">Wrong password!</p>
+        </div>
+    </div>
     <!-- Header -->
     <div class="topbar">
         <div class="topbar-left">
@@ -26,6 +35,131 @@
             <a href="/python-webserver/ui_admin.html?token=$(token)" class="chip">Admin</a>
         </div>
     </div>
+
+    <div class="admin-container">
+        <div class="sidebar">
+            <div class="user-block">
+                <h3 id="display-username">Loading...</h3>
+                <span id="display-level">Level: --</span>
+            </div>
+            <div class="side-nav">
+                <button class="active" onclick="showTab(event,'setting')">Settings</button>
+                <button onclick="showTab(event,'account')">Account Management</button>
+                <button onclick="showTab(event,'password')">Change Password</button>
+            </div>
+        </div>
+
+        <div class="admin-content" id="main-content">
+            <div id="tab-setting">
+                <h2>System Setting</h2>
+                <p>COMING SOON</p>
+            </div>
+            <div id="tab-account" style="display:none">
+                <h2>Account Management</h2>
+                <p>COMING SOON</p>
+            </div>
+            <div id="tab-password" style="display:none">
+                <h2>Change password:</h2>
+                <input type="password" placeholder="Mật khẩu cũ"><br><br>
+                <input type="password" placeholder="Mật khẩu mới"><br><br>
+                <button class="chip"
+                    style="background: #001B48; color: white; border:none; padding: 2px; cursor: pointer;">Update</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const token = "$(token)";
+        async function fetchData() {
+            try {
+                const res = await fetch(`/python-webserver/api/data?token=${token}`);
+                return await res.json();
+            } catch (err) {
+                console.error("Polling error:", err);
+                return null;
+            }
+        }
+        if (!localStorage.getItem("admin_secret")) {
+            localStorage.setItem("admin_secret", "boschrexroth");
+        }
+
+        function normalizeStatus(status) {
+            if (typeof status === "string") {
+                const trimmed = status.trim();
+
+                if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
+                    try {
+                        status = JSON.parse(trimmed);
+                    } catch (e) {
+                        console.error("JSON parse failed:", e);
+                    }
+                }
+            }
+
+            if (typeof status === "object" && status !== null) {
+                const firstKey = Object.keys(status)[0];
+                status = status[firstKey];
+            }
+
+            return String(status || "").toUpperCase();
+        }
+
+        function verifyAccess() {
+            const input = document.getElementById("admin-pass-input").value;
+            const secret = localStorage.getItem("admin_secret");
+            const errorMsg = document.getElementById("auth-error");
+
+            if (input === secret) {
+                document.getElementById("auth-overlay").style.display = "none";
+                // Lưu trạng thái đã login vào session để không phải nhập lại khi F5 (tùy chọn)
+                sessionStorage.setItem("isAdminAuthenticated", "true");
+            } else {
+                errorMsg.style.display = "block";
+                errorMsg.innerText = "Sai mật khẩu! Thử lại.";
+            }
+        }
+        if (sessionStorage.getItem("isAdminAuthenticated") === "true") {
+            document.getElementById("auth-overlay").style.display = "none";
+        }
+        function showTab(event, tabName) {
+            const tabs = ["tab-setting", "tab-account", "tab-password"];
+            tabs.forEach(t => document.getElementById(t).style.display = "none");
+
+            document.getElementById("tab-" + tabName).style.display = "block";
+
+            const buttons = document.querySelectorAll(".side-nav button");
+            buttons.forEach(btn => btn.classList.remove("active"));
+            event.currentTarget.classList.add("active");
+        }
+
+        document.getElementById("admin-pass-input").addEventListener("keypress", function (e) {
+            if (e.key === "Enter") verifyAccess();
+        });
+        async function updateAdminData() {
+            try {
+                const data = await fetchData();
+                if (!data) return;
+
+                const userName = data?.avg?.user?.name || "Unknown";
+
+                const rawLevel = data?.avg?.user?.level;
+                const userLevel = normalizeStatus(rawLevel) || "--";
+
+                document.getElementById("display-username").innerText = userName;
+                document.getElementById("display-level").innerText = "Level: " + userLevel;
+
+                localStorage.setItem("current_user", userName);
+                localStorage.setItem("current_level", userLevel);
+
+            } catch (error) {
+                console.error("Fail to fetch data from Data Layer:", error);
+                document.getElementById("display-username").innerText = "Offline";
+            }
+        }
+
+        updateAdminData();
+        setInterval(updateAdminData, 5000);
+    </script>
 </body>
 
 </html>

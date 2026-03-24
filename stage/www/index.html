@@ -101,7 +101,10 @@
                 <canvas id="scheduleChart"></canvas>
             </div>
             <div class="card">
-                <h3>ERRORS LOG</h3>
+                <div class="log-header">
+                    <h3>ERRORS LOG</h3>
+                    <button class="reset-btn" onclick="resetLogs()">Reset</button>
+                </div>
                 <section class="table_body">
                     <table>
                         <thead>
@@ -151,6 +154,7 @@
                     },
                     y: {
                         beginAtZero: true,
+                        max: 16,
                         ticks: {
                             color: '#001B48'
                         }
@@ -195,6 +199,32 @@
             });
         }
 
+        // Helper function for status
+        function normalizeStatus(status) {
+            if (typeof status === "string") {
+                const trimmed = status.trim();
+
+                if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
+                    try {
+                        status = JSON.parse(trimmed);
+                    } catch (e) {
+                        console.error("JSON parse failed:", e);
+                    }
+                }
+            }
+
+            if (typeof status === "object" && status !== null) {
+                const firstKey = Object.keys(status)[0];
+                status = status[firstKey];
+            }
+
+            return String(status || "").toUpperCase();
+        }
+
+        // Environment Monitoring
+        const tempGauge = createGauge(document.getElementById('tempGauge'), 0, '#018ABE', '℃');
+        const humidityGauge = createGauge(document.getElementById('humidityGauge'), 0, '#018ABE', '%');
+
         // OBJ Monitoring
         function updateStatus(elementId, status) {
             const badge = document.getElementById(elementId);
@@ -221,7 +251,7 @@
                 console.log(`Extracted status for ${elementId}:`, status);
             }
 
-            status = String(status || "").toUpperCase();
+            status = normalizeStatus(status);
 
             switch (status) {
                 case "WORKING":
@@ -242,10 +272,6 @@
                     break;
             }
         }
-
-        // Environment Monitoring
-        const tempGauge = createGauge(document.getElementById('tempGauge'), 0, '#018ABE', '℃');
-        const humidityGauge = createGauge(document.getElementById('humidityGauge'), 0, '#018ABE', '%');
 
         // Schedule Chart Value Setup
         const scheduleLabels = [
@@ -275,8 +301,9 @@
             }
         }
         function handleStatusChange(key, newStatus) {
-            newStatus = String(newStatus || "").toUpperCase();
+            newStatus = normalizeStatus(newStatus);
             const oldStatus = previousStatus[key];
+            const deviceName = key.split(".").slice(-2).join(".");
 
             if (oldStatus !== undefined && oldStatus !== newStatus) {
                 let type = "MESSAGE";
@@ -292,7 +319,7 @@
                 }
                 else if (oldStatus === "ERROR" || oldStatus === "STANDBY") {
                     type = "SUCCESS";
-                    message = "System Recovered";
+                    message = "System recovered";
                 }
 
                 createErrorLog(key, message, type);
@@ -331,7 +358,10 @@
 
             renderLogs();
         }
-
+        function resetLogs() {
+            localStorage.removeItem("efactory_logs");
+            renderLogs();
+        }
         // Fetch AVG. Data
         async function fetchData() {
             try {
@@ -378,7 +408,6 @@
         }
 
         renderLogs();
-        // Refresh loop
         updateDataFactory();
         setInterval(() => {
             updateDataFactory();

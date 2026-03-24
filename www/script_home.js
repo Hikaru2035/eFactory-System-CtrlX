@@ -1,0 +1,286 @@
+const token = "$(token)";
+
+// Create Chart
+scheduleChart = new Chart(document.getElementById('scheduleChart'), {
+  type: 'bar',
+  data: {
+    labels: ['01/01', '02/01', '03/01', '04/01', '05/01', '06/01', '07/01'],
+    datasets: [{
+      data: [0, 0, 0, 0, 0, 0, 0],
+      backgroundColor: '#001B48'
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      datalabels: {
+        anchor: 'end',
+        align: 'end',
+        color: '#001B48',
+        font: { weight: 'bold' }
+      }
+    },
+    scales: {
+      x: {
+        ticks: {
+          color: '#001B48',
+          font: { size: 12 }
+        }
+      },
+      y: {
+        beginAtZero: true,
+        ticks: {
+          color: '#001B48'
+        }
+      }
+    }
+  },
+  plugins: [ChartDataLabels]
+});
+const gaugeText = {
+  id: 'gaugeText',
+  afterDraw(chart, args, options) {
+    const { ctx, chartArea: { width, height } } = chart;
+    ctx.save();
+    ctx.font = 'bold 24px Arial';
+    ctx.fillStyle = '#001B48';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    const value = chart.config.data.datasets[0].data[0];
+    const unit = chart.config.options.plugins.gaugeUnit || ''; // lấy unit
+    ctx.fillText(value + unit, width / 2, height / 2);
+  }
+};
+function createGauge(ctx, value, color, unit) {
+  return new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      datasets: [{
+        data: [value, 100 - value],
+        backgroundColor: [color, '#001B48'],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      cutout: '65%',
+      plugins: {
+        legend: { display: false },
+        tooltip: { enabled: false },
+        gaugeUnit: unit
+      }
+    },
+    plugins: [gaugeText]
+  });
+}
+
+// Helper function for status
+function normalizeStatus(status) {
+  if (typeof status === "string") {
+    const trimmed = status.trim();
+
+    if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
+      try {
+        status = JSON.parse(trimmed);
+      } catch (e) {
+        console.error("JSON parse failed:", e);
+      }
+    }
+  }
+
+  if (typeof status === "object" && status !== null) {
+    const firstKey = Object.keys(status)[0];
+    status = status[firstKey];
+  }
+
+  return String(status || "").toUpperCase();
+}
+
+// Environment Monitoring
+const tempGauge = createGauge(document.getElementById('tempGauge'), 0, '#018ABE', '℃');
+const humidityGauge = createGauge(document.getElementById('humidityGauge'), 0, '#018ABE', '%');
+
+// OBJ Monitoring
+function updateStatus(elementId, status) {
+  const badge = document.getElementById(elementId);
+  if (!badge) {
+    console.warn(`[DEBUG] Element not found: ${elementId}`);
+    return;
+  }
+
+  if (typeof status === "string") {
+    const trimmed = status.trim();
+    if (trimmed.startsWith("{") && trimmed.endsWith("}")) {
+      try {
+        status = JSON.parse(trimmed);
+        console.log(`Parsed JSON status for ${elementId}:`, status);
+      } catch (e) {
+        console.error(`JSON parse failed for ${elementId}:`, e);
+      }
+    }
+  }
+
+  if (typeof status === "object" && status !== null) {
+    const firstKey = Object.keys(status)[0];
+    status = status[firstKey];
+    console.log(`Extracted status for ${elementId}:`, status);
+  }
+
+  status = normalizeStatus(status);
+
+  switch (status) {
+    case "WORKING":
+      badge.textContent = "✓";
+      badge.className = "badge ok";
+      break;
+
+    case "STANDBY":
+    case "ERROR":
+      badge.textContent = "!";
+      badge.className = "badge warn";
+      break;
+
+    default:
+      badge.textContent = "?";
+      badge.className = "badge";
+      console.warn(`Unknown status for ${elementId}: "${status}"`);
+      break;
+  }
+}
+
+// Schedule Chart Value Setup
+const scheduleLabels = [
+  '01/01', '02/01', '03/01',
+  '04/01', '05/01', '06/01', '07/01'
+];
+function extractSchedules(avg) {
+  const values = [];
+  for (let i = 1; i <= 7; i++) {
+    values.push(avg[`schedule${i}`]);
+  }
+  return values;
+}
+
+// Error Logs Business Logic
+const previousStatus = JSON.parse(localStorage.getItem("efactory_prev_status") || "{}"); function scanStatus(obj, path = "") {
+  for (const key in obj) {
+    const value = obj[key];
+    const currentPath = path ? `${path}.${key}` : key;
+
+    if (key === "status" && typeof value === "string") {
+      handleStatusChange(currentPath, value);
+    }
+    if (typeof value === "object" && value !== null) {
+      scanStatus(value, currentPath);
+    }
+  }
+}
+function handleStatusChange(key, newStatus) {
+  newStatus = normalizeStatus(newStatus);
+  const oldStatus = previousStatus[key];
+  const deviceName = key.split(".").slice(-2).join(".");
+
+  if (oldStatus !== undefined && oldStatus !== newStatus) {
+    let type = "MESSAGE";
+    let message = `Changed from ${oldStatus} to ${newStatus}`;
+
+    if (newStatus === "ERROR") {
+      type = "ERROR";
+      message = "Device failure detected";
+    }
+    else if (newStatus === "STANDBY" || newStatus === "WARNING") {
+      type = "WARN";
+      message = "Warning condition detected";
+    }
+    else if (oldStatus === "ERROR" || oldStatus === "STANDBY") {
+      type = "SUCCESS";
+      message = "System recovered";
+    }
+
+    createErrorLog(key, message, type);
+  }
+  previousStatus[key] = newStatus;
+  localStorage.setItem("efactory_prev_status", JSON.stringify(previousStatus));
+}
+function renderLogs() {
+  const table = document.getElementById("error-log-body");
+  if (!table) return;
+  const logs = JSON.parse(localStorage.getItem("efactory_logs") || "[]");
+  table.innerHTML = "";
+  logs.forEach(log => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+            <td>${log.time}</td>
+            <td>${log.device} - ${log.message}</td>
+            <td class="${log.type.toLowerCase()}">${log.type}</td>
+        `;
+    table.appendChild(row);
+  });
+}
+function createErrorLog(device, message, type) {
+  const logEntry = {
+    time: new Date().toLocaleTimeString(),
+    device: device,
+    message: message,
+    type: type
+  };
+  let logs = JSON.parse(localStorage.getItem("efactory_logs") || "[]");
+  logs.unshift(logEntry);
+
+  if (logs.length > 50) logs = logs.slice(0, 50);
+
+  localStorage.setItem("efactory_logs", JSON.stringify(logs));
+
+  renderLogs();
+}
+
+// Fetch AVG. Data
+async function fetchData() {
+  try {
+    const res = await fetch(`/python-webserver/api/data?token=${token}`);
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error("Polling error:", err);
+    return null;
+  }
+}
+async function updateDataFactory() {
+  const data = await fetchData();
+  if (!data) return;
+
+  document.getElementById("avg-availability").textContent = data.avg.availability;
+  document.getElementById("avg-performance").textContent = data.avg.performance;
+  document.getElementById("avg-quality").textContent = data.avg.quality;
+  document.getElementById("avg-oee").textContent = data.avg.oee;
+
+  // Gauges
+  tempGauge.data.datasets[0].data = [data.avg.temperature, 100 - data.avg.temperature];
+  tempGauge.update();
+  humidityGauge.data.datasets[0].data = [data.avg.humidity, 100 - data.avg.humidity];
+  humidityGauge.update();
+
+  // Status
+  updateStatus("driver1-status", data.factoryA.status.driver);
+  updateStatus("driver2-status", data.factoryB.status.driver);
+  updateStatus("core1-status", data.factoryB.status.driver);
+  updateStatus("core2-status", data.factoryB.status.driver);
+
+  // ===== Schedule Chart (7 values) =====
+  const schedulesValue = extractSchedules(data.avg);
+
+  scheduleChart.data.labels = scheduleLabels;
+  scheduleChart.data.datasets[0].data = schedulesValue;
+
+  console.log("Schedule values:", schedulesValue);
+  scheduleChart.update();
+
+  // ===== Error Logs =====
+  scanStatus(data);
+}
+
+renderLogs();
+updateDataFactory();
+setInterval(() => {
+  updateDataFactory();
+}, 500);

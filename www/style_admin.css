@@ -1,0 +1,133 @@
+.admin-container {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    color: #001B48;
+    min-height: calc(100vh - 80px);
+}
+
+.admin-content h2{
+    color:#001B48;
+    margin-bottom:20px;
+    font-size: 48px;
+}
+
+.admin-content input{
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:6px;
+    width:250px;
+}
+
+.sidebar {
+    width: 320px;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #e5e5e5;
+}
+
+.user-block {
+    text-align: center;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 20px;
+}
+
+.user-block h3 {
+    margin: 10px 0;
+    color: #001B48;
+    font-weight: 800;
+    font-size: 3vh;
+}
+
+.user-block span {
+    font-size: 2vh;
+    background: #001B48;
+    color: #fff;
+    padding: 4px 14px;
+    border-radius: 12px;
+}
+
+.side-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.side-nav button {
+    background: none;
+    border: none;
+    text-align: left;
+    padding: 18px 20px;
+    color: #001B48;
+    font-weight: 600;
+    font-size: 20px;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: 0.25s;
+}
+
+.side-nav button:hover {
+    background: rgba(1, 138, 190, 0.3);
+}
+
+.side-nav button.active {
+    background: #001B48;
+    color: white;
+}
+
+.admin-content {
+    flex: 1;
+    background: #fff;
+    border-radius: 12px;
+    padding: 30px;
+    min-height: 400px;
+}
+
+#auth-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #001B48;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    backdrop-filter: blur(6px);
+}
+
+.auth-box h2{
+    font-size:32px;
+    margin-bottom:20px;
+}
+
+.auth-box {
+    background: white;
+    padding: 80px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+.auth-box input {
+    padding: 16px;
+    width: 320px;
+    font-size: 24px;
+    margin-bottom: 10px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.auth-box button {
+    padding: 16px 40px;
+    font-size: 18px;
+    background: #001B48;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 8px;
+}

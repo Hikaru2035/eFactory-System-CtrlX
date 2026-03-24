@@ -2,7 +2,6 @@ README.md
 main.py
 setup.cfg
 setup.py
-app/aws_publisher.py
 app/ctrlx_datalayer_helper.py
 app/datalayer.py
 sdk_py_webserver.egg-info/PKG-INFO

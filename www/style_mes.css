@@ -55,6 +55,14 @@
     line-height: 1.4;
 }
 
+.card h3 {
+    font-size: 20px;
+    font-weight: 800;
+    color: #001B48;
+    letter-spacing: 1px;
+    margin-bottom: 18px;
+}
+
 .btn-connect {
     position: absolute;
     bottom: 1.5vh;
@@ -90,9 +98,10 @@
 .dot-yellow { background: #ffd600; }
 
 .card h3 {
-    margin-top: 0;
-    font-size: 16px;
-    margin-bottom: 10px;
+    margin: 0 0 0.5vh;
+    font-size: 2vh;
+    letter-spacing: .08em;
+    text-transform: uppercase;
 }
 
 /* placeholder chart */
@@ -100,4 +109,110 @@
     height: 150px;
     background: rgba(255, 255, 255, 0.3);
     border-radius: 8px;
+}
+
+/* ===== BANDWIDTH CARD ===== */
+
+.bandwidth-container {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.gauge-wrapper {
+    position: relative;
+    width: 240px;
+    height: 240px;
+}
+
+#gaugeValue {
+    position: absolute;
+    bottom: 45px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 20px;
+    font-weight: 700;
+    color: #001B48;
+}
+
+#bandwidthGauge {
+    width: 220px !important;
+    height: 220px !important;
+}
+
+/* info */
+.bandwidth-info{
+    flex:1;
+    font-size:14px;
+}
+
+.bandwidth-info p {
+    margin: 6px 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #001B48;
+}
+
+/* warning bar */
+.bw-bar {
+    width: 100%;
+    height: 10px;
+    background: #001B48;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+#bwBarFill {
+    height: 100%;
+    width: 0%;
+    background: #001B48;
+    border-radius: 8px;
+    transition: width 0.4s ease;
+}
+
+.view-buttons{
+    display:flex;
+    gap:10px;
+    margin-bottom:10px;
+}
+
+.view-btn{
+    background:#eee;
+    border:none;
+    padding:6px 12px;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+.view-btn.active{
+    background:#001B48;
+    color:white;
+}
+
+.metrics-view {
+    display: none;
+    height: 100%;
+    flex-direction: column;
+    gap: 25px;
+    padding: 20px;
+    box-sizing: border-box;
+    padding-bottom: 10px;
+}
+
+.metrics-row {
+    display: flex;
+    gap: 20px;
+    flex: 1; 
+    min-height: 0;
+}
+
+.metrics-row canvas {
+    flex: 1;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.gauge-row{
+    justify-content:center;
+    height:200px;
 }

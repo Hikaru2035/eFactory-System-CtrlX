@@ -15,7 +15,7 @@ extracted_metadata:
     _data: {}
     common_id_list: []
 project_options:
-  deb_arch: amd64
+  deb_arch: arm64
 properties:
   override-pull: snapcraftctl pull
   parse-info: []

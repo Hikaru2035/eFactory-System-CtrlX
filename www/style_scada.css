@@ -60,18 +60,22 @@ body {
 
 .left-top-scada {
     display: grid;
-    grid-template-rows: 1fr auto 1fr;
+    grid-template-rows: auto auto 1fr;
     gap: 12px;
 }
 
 .oee-info {
-    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; 
+    gap: 10px;
+    padding: 20px 24px;
 }
 
 /* ---- OEE NAV CARD ---- */
 .oee-nav-card {
     background: #001B48;
-    border-radius: 60px;
+    border-radius: 14px;
     text-align: center;
 
     padding: 4px 0;
@@ -484,4 +488,30 @@ body {
 
     line-height:1.6;
 
+}
+
+.driver-control {
+    display: flex;
+    gap: 8px;
+}
+
+.ctrl-btn {
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: none;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s ease;
+}
+
+/* trạng thái */
+.btn-on {
+    background: #22c55e;
+    color: #001B48;
+}
+
+.btn-off {
+    background: #7f1d1d;
+    color: #fff;
 }

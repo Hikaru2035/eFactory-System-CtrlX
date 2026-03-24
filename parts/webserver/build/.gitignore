@@ -19,9 +19,9 @@ app/certs/*.pub
 # Snap build
 ############################
 *.snap
-prime/
-stage/
-parts/
+prime/*
+stage/*
+parts/*
 
 ############################
 # Runtime / data

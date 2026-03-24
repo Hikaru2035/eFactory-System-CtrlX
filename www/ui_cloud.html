@@ -55,41 +55,49 @@
 
             <div class="section section-4">
                 <div class="input-group">
-                    <div class="status-dot red"></div>
-                    <input type="text" value="127.0.0.1" readonly>
+                    <div id="ctrlxDot" class="status-dot green"></div>
+                    <input id="ctrlxIpField" type="text" value="127.0.0.1" readonly>
                 </div>
+
                 <div class="info-list">
                     <div class="info-item">
                         <span class="info-label">Device name</span>
-                        <span class="info-value">—</span>
+                        <span id="ctrlxDeviceName" class="info-value">—</span>
                     </div>
+
                     <div class="info-item">
                         <span class="info-label">System status</span>
-                        <span class="info-value">—</span>
+                        <span id="ctrlxSystemStatus" class="info-value">—</span>
                     </div>
+
                     <div class="info-item">
                         <span class="info-label">Hardware platform</span>
-                        <span class="info-value">—</span>
+                        <span id="ctrlxArchitecture" class="info-value">—</span>
                     </div>
+
                     <div class="info-item">
                         <span class="info-label">Serial number</span>
-                        <span class="info-value">—</span>
+                        <span id="ctrlxMac" class="info-value">—</span>
                     </div>
+
                     <div class="info-item">
-                        <span class="info-label">Type code</span>
-                        <span class="info-value">—</span>
+                        <span class="info-label">OS</span>
+                        <span id="ctrlxOS" class="info-value">—</span>
                     </div>
+
+                    <div class="info-item">
+                        <span class="info-label">OS Version</span>
+                        <span id="ctrlxOSVersion" class="info-value">—</span>
+                    </div>
+
                     <div class="info-item">
                         <span class="info-label">App</span>
-                        <span class="info-value">—</span>
+                        <span id="ctrlxApp" class="info-value">—</span>
                     </div>
-                    <div class="info-item">
-                        <span class="info-label">License(s)</span>
-                        <span class="info-value">—</span>
-                    </div>
+
                     <div class="info-item">
                         <span class="info-label">Ports</span>
-                        <span class="info-value">—</span>
+                        <span id="ctrlxPorts" class="info-value">8442</span>
                     </div>
                 </div>
             </div>
@@ -109,50 +117,63 @@
                 return null;
             }
         }
-        async function updateCloud() {
+        async function updateUI() {
             const data = await fetchData();
             if (!data) return;
-            const cloud = data.avg.cloud;
 
-            const connected = cloud.status.connected;
-            const connecting = cloud.status.connecting;
-            const error = cloud.status.error;
+            const avg = data.avg;
+            const cloud = avg.cloud;
+            const info = avg.info;
+            const system = avg.system;
 
-            const broker = cloud.info.broker;
-            const region = cloud.info.region;
-            const protocol = cloud.info.protocol;
-            const ip = cloud.info.ipAddress;
-            const lastSync = cloud.info.lastSync;
-
-            // ===== STATUS DOT =====
+            // ================= CLOUD =================
             const awsDot = document.getElementById("awsDot");
             awsDot.classList.remove("green", "red", "yellow");
-            if (connected) {
+
+            if (cloud.status.connected) {
                 awsDot.classList.add("green");
-            }
-            else if (connecting) {
+            } else if (cloud.status.connecting) {
                 awsDot.classList.add("yellow");
-            }
-            else {
+            } else {
                 awsDot.classList.add("red");
             }
 
-            // ===== TEXT STATUS =====
             document.getElementById("serviceStatusField").textContent =
-                connected ? "Connected" :
-                    connecting ? "Connecting..." :
-                        error ? "Error" :
+                cloud.status.connected ? "Connected" :
+                    cloud.status.connecting ? "Connecting..." :
+                        cloud.status.error ? "Error" :
                             "Disconnected";
-            // ===== UPDATE INFO =====
-            document.getElementById("brokerField").value = broker || "-";
-            document.getElementById("regionField").textContent = region || "-";
-            document.getElementById("protocolField").textContent = protocol || "-";
-            document.getElementById("ipField").textContent = ip || "-";
-            document.getElementById("lastSyncField").textContent = lastSync || "-";
-        }
 
-        setInterval(updateCloud, 500);
-        updateCloud();
+            document.getElementById("brokerField").value = cloud.info.broker || "-";
+            document.getElementById("regionField").textContent = cloud.info.region || "-";
+            document.getElementById("protocolField").textContent = cloud.info.protocol || "-";
+            document.getElementById("ipField").textContent = cloud.info.ipAddress || "-";
+
+            // ================= CTRLX =================
+            const ctrlxDot = document.getElementById("ctrlxDot");
+            ctrlxDot.classList.remove("green", "red");
+
+            if (info.ip) {
+                ctrlxDot.classList.add("green");
+            } else {
+                ctrlxDot.classList.add("red");
+            }
+
+            document.getElementById("ctrlxIpField").value = info.ip || "-";
+            document.getElementById("ctrlxDeviceName").textContent = info.hostname || "-";
+            document.getElementById("ctrlxArchitecture").textContent = info.architecture || "-";
+            document.getElementById("ctrlxOS").textContent = info.os || "-";
+            document.getElementById("ctrlxOSVersion").textContent = info.osVersion || "-";
+            document.getElementById("ctrlxMac").textContent = info.macAddress || "-";
+
+            document.getElementById("ctrlxSystemStatus").textContent =
+                system.cpuUtilization < 90 ? "Operating" : "Overload";
+
+            document.getElementById("ctrlxApp").textContent = "eFactory System";
+        }
+        
+        setInterval(updateUI, 500);
+        updateUI();
     </script>
 
 </body>
